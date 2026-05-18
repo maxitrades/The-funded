@@ -1,0 +1,59 @@
+/* AUTH PAGES */
+.auth-body { min-height: 100vh; display: flex; align-items: center; justify-content: center; padding: 40px 20px; position: relative; }
+.auth-bg { position: fixed; inset: 0; z-index: 0; }
+.auth-grid {
+  position: absolute; inset: 0;
+  background-image: linear-gradient(rgba(212,175,55,0.04) 1px, transparent 1px), linear-gradient(90deg, rgba(212,175,55,0.04) 1px, transparent 1px);
+  background-size: 48px 48px;
+}
+.auth-glow {
+  position: absolute; top: 30%; left: 50%; transform: translate(-50%,-50%);
+  width: 600px; height: 600px;
+  background: radial-gradient(circle, rgba(212,175,55,0.07) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.auth-container { position: relative; z-index: 1; width: 100%; max-width: 440px; }
+.auth-logo { display: flex; align-items: center; gap: 12px; text-decoration: none; justify-content: center; margin-bottom: 36px; }
+.auth-card {
+  background: var(--dark2);
+  border: 1px solid var(--border-bright);
+  border-radius: 24px;
+  padding: 40px;
+  box-shadow: var(--glow-strong);
+  animation: fadeInUp 0.6s cubic-bezier(0.4,0,0.2,1);
+}
+.auth-header { text-align: center; margin-bottom: 32px; }
+.auth-header h2 { font-size: 1.8rem; margin-bottom: 8px; }
+.auth-divider { text-align: center; margin: 24px 0; position: relative; }
+.auth-divider::before { content: ''; position: absolute; top: 50%; left: 0; right: 0; height: 1px; background: var(--border); }
+.auth-divider span { background: var(--dark2); padding: 0 16px; color: var(--white-dim); font-size: 0.8rem; position: relative; }
+.demo-login { margin-top: 24px; padding-top: 24px; border-top: 1px solid var(--border); text-align: center; }
+
+/* Signup specific */
+.signup-progress { display: flex; gap: 8px; margin-bottom: 32px; }
+.progress-step {
+  flex: 1; height: 4px; border-radius: 2px;
+  background: var(--dark4);
+  transition: var(--transition);
+}
+.progress-step.active { background: var(--gold); }
+.progress-step.done { background: var(--green); }
+
+.plan-selector { display: grid; grid-template-columns: repeat(3, 1fr); gap: 10px; margin-bottom: 8px; }
+.plan-option {
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  padding: 14px 10px;
+  text-align: center;
+  cursor: pointer;
+  transition: var(--transition);
+}
+.plan-option:hover { border-color: var(--border-bright); }
+.plan-option.selected { border-color: var(--gold); background: rgba(212,175,55,0.08); }
+.plan-option .plan-name { font-family: 'Syne',sans-serif; font-weight: 700; font-size: 0.8rem; margin-bottom: 4px; }
+.plan-option .plan-price-small { color: var(--gold); font-size: 0.85rem; font-weight: 600; }
+
+@media (max-width: 480px) {
+  .auth-card { padding: 28px 20px; }
+  .plan-selector { grid-template-columns: 1fr; }
+}

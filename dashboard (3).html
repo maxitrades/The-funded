@@ -1,0 +1,402 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Dashboard – The Funded Traders</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/dashboard.css">
+</head>
+<body class="dashboard-body">
+  <div class="cursor"></div>
+  <div class="cursor-follower"></div>
+
+  <!-- SIDEBAR -->
+  <aside class="sidebar" id="sidebar">
+    <div class="sidebar-logo">
+      <a href="index.html">
+        <img src="assets/logo.svg" alt="TFT" style="height:36px;" onerror="this.style.display='none'">
+        <span class="nav-logo-text">TFT <span>Dashboard</span></span>
+      </a>
+    </div>
+    <nav class="sidebar-nav">
+      <a href="#" class="sidebar-link active" data-page="overview">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>
+        Overview
+      </a>
+      <a href="#" class="sidebar-link" data-page="trading">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+        Trading Stats
+      </a>
+      <a href="#" class="sidebar-link" data-page="trades">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M3 3h18v18H3z"/><path d="M3 9h18M9 21V9"/></svg>
+        Trade History
+      </a>
+      <a href="#" class="sidebar-link" data-page="payouts">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+        Payouts
+      </a>
+      <a href="#" class="sidebar-link" data-page="certificates">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/></svg>
+        Certificates
+      </a>
+      <div class="sidebar-divider"></div>
+      <a href="challenges.html" class="sidebar-link">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="16"/><line x1="8" y1="12" x2="16" y2="12"/></svg>
+        New Challenge
+      </a>
+      <a href="profile.html" class="sidebar-link">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+        Profile
+      </a>
+      <a href="contact.html" class="sidebar-link">
+        <svg width="18" height="18" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+        Support
+      </a>
+    </nav>
+    <div class="sidebar-user" id="sidebarUser">
+      <div class="sidebar-avatar" id="sidebarAvatar">DT</div>
+      <div class="sidebar-user-info">
+        <div class="sidebar-name" id="sidebarName">Demo Trader</div>
+        <div class="sidebar-plan" id="sidebarPlan">Endurance $50K</div>
+      </div>
+      <button onclick="logout()" style="background:none;border:none;color:var(--white-dim);cursor:pointer;padding:4px;" title="Logout">
+        <svg width="16" height="16" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+      </button>
+    </div>
+  </aside>
+
+  <!-- MAIN CONTENT -->
+  <main class="dashboard-main">
+    <!-- TOPBAR -->
+    <div class="dashboard-topbar">
+      <button class="sidebar-toggle" id="sidebarToggle" onclick="toggleSidebar()">
+        <svg width="20" height="20" fill="none" stroke="currentColor" stroke-width="2" viewBox="0 0 24 24"><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="18" x2="21" y2="18"/></svg>
+      </button>
+      <h1 class="page-title" id="pageTitle">Overview</h1>
+      <div class="topbar-right">
+        <span class="badge badge-green" id="accountStatus">● PHASE 1</span>
+        <div class="topbar-avatar" id="topbarAvatar">DT</div>
+      </div>
+    </div>
+
+    <!-- PAGES -->
+    <!-- OVERVIEW PAGE -->
+    <div id="page-overview" class="dash-page active">
+      <div class="dash-grid">
+        <!-- Metric Cards -->
+        <div class="metric-card" data-animate>
+          <div class="metric-label">Account Balance</div>
+          <div class="metric-value gold" id="metricBalance">$52,840.00</div>
+          <div class="metric-change green" id="metricProfit">▲ +$2,840 (+5.68%)</div>
+        </div>
+        <div class="metric-card" data-animate data-delay="1">
+          <div class="metric-label">Daily Drawdown Used</div>
+          <div class="metric-value" id="metricDailyDD">1.2%</div>
+          <div class="metric-sub">Limit: 5% remaining: 3.8%</div>
+          <div class="progress progress-green" style="margin-top:12px;"><div class="progress-bar" style="width:24%;"></div></div>
+        </div>
+        <div class="metric-card" data-animate data-delay="2">
+          <div class="metric-label">Max Drawdown Used</div>
+          <div class="metric-value" id="metricMaxDD">4.8%</div>
+          <div class="metric-sub">Limit: 10% remaining: 5.2%</div>
+          <div class="progress" style="margin-top:12px;"><div class="progress-bar" style="width:48%;background:var(--gold);"></div></div>
+        </div>
+        <div class="metric-card" data-animate data-delay="3">
+          <div class="metric-label">Profit Target</div>
+          <div class="metric-value green">$4,000</div>
+          <div class="metric-sub">Achieved: $2,840 / $4,000</div>
+          <div class="progress progress-green" style="margin-top:12px;"><div class="progress-bar" style="width:71%;"></div></div>
+        </div>
+      </div>
+
+      <!-- Chart -->
+      <div class="card" style="margin-top:24px;" data-animate>
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:24px;flex-wrap:wrap;gap:12px;">
+          <div>
+            <h3 style="font-size:1.1rem;">Equity Curve</h3>
+            <p class="dim" style="font-size:0.8rem;">Last 30 days performance</p>
+          </div>
+          <div style="display:flex;gap:8px;">
+            <button class="btn btn-ghost btn-sm active-period" onclick="setPeriod(this,'7d')">7D</button>
+            <button class="btn btn-ghost btn-sm" onclick="setPeriod(this,'30d')">30D</button>
+            <button class="btn btn-ghost btn-sm" onclick="setPeriod(this,'all')">All</button>
+          </div>
+        </div>
+        <div class="chart-container">
+          <svg id="equityCurve" viewBox="0 0 800 200" preserveAspectRatio="none" style="width:100%;height:200px;">
+            <defs>
+              <linearGradient id="equityFill" x1="0" y1="0" x2="0" y2="1">
+                <stop offset="0%" stop-color="#D4AF37" stop-opacity="0.25"/>
+                <stop offset="100%" stop-color="#D4AF37" stop-opacity="0"/>
+              </linearGradient>
+            </defs>
+            <path id="equityArea" d="" fill="url(#equityFill)"/>
+            <path id="equityLine" d="" fill="none" stroke="var(--gold)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/>
+          </svg>
+        </div>
+      </div>
+
+      <!-- Bottom row -->
+      <div class="grid-2" style="margin-top:24px;">
+        <!-- Objectives -->
+        <div class="card" data-animate>
+          <h3 style="font-size:1rem;margin-bottom:20px;">Challenge Objectives</h3>
+          <div class="objective-row">
+            <div class="objective-info">
+              <span>Profit Target (8%)</span>
+              <span class="gold">$2,840 / $4,000</span>
+            </div>
+            <div class="progress progress-green" style="margin-top:6px;"><div class="progress-bar" style="width:71%;"></div></div>
+          </div>
+          <div class="objective-row">
+            <div class="objective-info">
+              <span>Min Trading Days</span>
+              <span class="green">18 / 5 ✓</span>
+            </div>
+            <div class="progress progress-green" style="margin-top:6px;"><div class="progress-bar" style="width:100%;"></div></div>
+          </div>
+          <div class="objective-row">
+            <div class="objective-info">
+              <span>Daily Drawdown (max 5%)</span>
+              <span style="color:var(--white);">1.2%</span>
+            </div>
+            <div class="progress progress-green" style="margin-top:6px;"><div class="progress-bar" style="width:24%;"></div></div>
+          </div>
+          <div class="objective-row" style="border:none;">
+            <div class="objective-info">
+              <span>Max Drawdown (max 10%)</span>
+              <span class="gold">4.8%</span>
+            </div>
+            <div class="progress" style="margin-top:6px;"><div class="progress-bar" style="width:48%;background:var(--gold);"></div></div>
+          </div>
+        </div>
+
+        <!-- Recent Trades -->
+        <div class="card" data-animate data-delay="1">
+          <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;">
+            <h3 style="font-size:1rem;">Recent Trades</h3>
+            <a href="#" onclick="showPage('trades')" style="font-size:0.8rem;color:var(--gold);text-decoration:none;">View All →</a>
+          </div>
+          <div class="mini-trades">
+            <div class="mini-trade"><span class="badge badge-green">BUY</span><span>XAUUSD</span><span class="green">+$340</span></div>
+            <div class="mini-trade"><span class="badge badge-red">SELL</span><span>EURUSD</span><span class="green">+$180</span></div>
+            <div class="mini-trade"><span class="badge badge-green">BUY</span><span>NAS100</span><span class="red">-$90</span></div>
+            <div class="mini-trade"><span class="badge badge-green">BUY</span><span>GBPUSD</span><span class="green">+$210</span></div>
+            <div class="mini-trade"><span class="badge badge-red">SELL</span><span>BTCUSD</span><span class="green">+$450</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRADING STATS PAGE -->
+    <div id="page-trading" class="dash-page">
+      <div class="grid-4" style="margin-bottom:24px;">
+        <div class="metric-card"><div class="metric-label">Win Rate</div><div class="metric-value gold">67%</div></div>
+        <div class="metric-card"><div class="metric-label">Total Trades</div><div class="metric-value">48</div></div>
+        <div class="metric-card"><div class="metric-label">Avg Win</div><div class="metric-value green">$284</div></div>
+        <div class="metric-card"><div class="metric-label">Avg Loss</div><div class="metric-value red">$142</div></div>
+        <div class="metric-card"><div class="metric-label">Profit Factor</div><div class="metric-value">2.1</div></div>
+        <div class="metric-card"><div class="metric-label">Best Trade</div><div class="metric-value green">$850</div></div>
+        <div class="metric-card"><div class="metric-label">Worst Trade</div><div class="metric-value red">-$380</div></div>
+        <div class="metric-card"><div class="metric-label">Avg RR</div><div class="metric-value">1:2.0</div></div>
+      </div>
+      <div class="grid-2">
+        <div class="card">
+          <h3 style="font-size:1rem;margin-bottom:16px;">Instruments Traded</h3>
+          <div class="instrument-row"><span>XAUUSD</span><div class="progress progress-green" style="flex:1;margin:0 12px;"><div class="progress-bar" style="width:45%;"></div></div><span class="green">45%</span></div>
+          <div class="instrument-row"><span>EURUSD</span><div class="progress progress-green" style="flex:1;margin:0 12px;"><div class="progress-bar" style="width:22%;"></div></div><span class="green">22%</span></div>
+          <div class="instrument-row"><span>NAS100</span><div class="progress progress-green" style="flex:1;margin:0 12px;"><div class="progress-bar" style="width:18%;"></div></div><span>18%</span></div>
+          <div class="instrument-row"><span>BTCUSD</span><div class="progress progress-green" style="flex:1;margin:0 12px;"><div class="progress-bar" style="width:15%;"></div></div><span>15%</span></div>
+        </div>
+        <div class="card">
+          <h3 style="font-size:1rem;margin-bottom:16px;">Trading Sessions</h3>
+          <div class="instrument-row"><span>London</span><div class="progress progress-green" style="flex:1;margin:0 12px;"><div class="progress-bar" style="width:55%;"></div></div><span class="green">55%</span></div>
+          <div class="instrument-row"><span>New York</span><div class="progress progress-green" style="flex:1;margin:0 12px;"><div class="progress-bar" style="width:30%;"></div></div><span>30%</span></div>
+          <div class="instrument-row"><span>Asian</span><div class="progress" style="flex:1;margin:0 12px;"><div class="progress-bar" style="width:15%;background:var(--gold);"></div></div><span>15%</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- TRADE HISTORY PAGE -->
+    <div id="page-trades" class="dash-page">
+      <div class="card" style="margin-bottom:16px;">
+        <div style="display:flex;gap:12px;flex-wrap:wrap;align-items:center;">
+          <input type="text" class="form-input" style="max-width:200px;padding:10px 14px;" placeholder="Search symbol...">
+          <select class="form-select" style="max-width:160px;padding:10px 14px;"><option>All directions</option><option>Buy</option><option>Sell</option></select>
+          <select class="form-select" style="max-width:160px;padding:10px 14px;"><option>All results</option><option>Profit</option><option>Loss</option></select>
+        </div>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <table class="table">
+          <thead><tr><th>Date</th><th>Symbol</th><th>Direction</th><th>Lots</th><th>Open</th><th>Close</th><th>P&L</th></tr></thead>
+          <tbody id="tradeHistoryBody"></tbody>
+        </table>
+      </div>
+    </div>
+
+    <!-- PAYOUTS PAGE -->
+    <div id="page-payouts" class="dash-page">
+      <div class="grid-3" style="margin-bottom:24px;">
+        <div class="metric-card"><div class="metric-label">Available to Withdraw</div><div class="metric-value gold">$2,272</div><div class="metric-sub">80% of $2,840 profit</div></div>
+        <div class="metric-card"><div class="metric-label">Total Paid Out</div><div class="metric-value green">$0</div></div>
+        <div class="metric-card"><div class="metric-label">Next Payout Eligible</div><div class="metric-value">12 days</div></div>
+      </div>
+      <div class="card" style="margin-bottom:24px;">
+        <h3 style="font-size:1rem;margin-bottom:20px;">Request Payout</h3>
+        <div class="grid-2">
+          <div>
+            <div class="form-group">
+              <label class="form-label">Amount (USD)</label>
+              <input type="number" class="form-input" placeholder="Min $50" id="payoutAmount">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Payment Method</label>
+              <select class="form-select" id="payoutMethod">
+                <option>USDT (TRC20)</option>
+                <option>Bitcoin (BTC)</option>
+                <option>Bank Transfer</option>
+                <option>M-Pesa</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Wallet / Account Address</label>
+              <input type="text" class="form-input" placeholder="Your wallet address or account number">
+            </div>
+            <button onclick="requestPayout()" class="btn btn-gold">Request Payout</button>
+          </div>
+          <div class="card" style="padding:20px;background:var(--dark3);">
+            <h4 style="font-size:0.9rem;margin-bottom:16px;">Payout Info</h4>
+            <div class="rule-row"><span>Processing Time</span><span>48 hours</span></div>
+            <div class="rule-row"><span>Minimum</span><span>$50</span></div>
+            <div class="rule-row"><span>Fee</span><span class="green">None</span></div>
+            <div class="rule-row"><span>First Payout</span><span>After 14 days</span></div>
+            <div class="rule-row" style="border:none;"><span>Challenge Fee Refund</span><span class="green">Included</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="card" style="padding:0;overflow:hidden;">
+        <div style="padding:20px 24px;border-bottom:1px solid var(--border);"><h3 style="font-size:1rem;">Payout History</h3></div>
+        <div style="padding:40px;text-align:center;color:var(--white-dim);">No payouts yet. Keep trading to reach your first withdrawal!</div>
+      </div>
+    </div>
+
+    <!-- CERTIFICATES PAGE -->
+    <div id="page-certificates" class="dash-page">
+      <div class="grid-2">
+        <div class="card" style="text-align:center;padding:48px 32px;">
+          <div style="font-size:3rem;margin-bottom:16px;">🏅</div>
+          <h3>Phase 1 Certificate</h3>
+          <p class="dim" style="margin:12px 0;font-size:0.875rem;">Complete Phase 1 to earn your certificate of achievement.</p>
+          <span class="badge badge-gold">In Progress</span>
+        </div>
+        <div class="card" style="text-align:center;padding:48px 32px;opacity:0.5;">
+          <div style="font-size:3rem;margin-bottom:16px;">🏆</div>
+          <h3>Funded Trader Certificate</h3>
+          <p class="dim" style="margin:12px 0;font-size:0.875rem;">Pass all phases to receive your official funded trader certificate.</p>
+          <span class="badge">Locked</span>
+        </div>
+      </div>
+    </div>
+  </main>
+
+  <script src="js/main.js"></script>
+  <script>
+    // Auth guard
+    if (!isLoggedIn()) { window.location.href = 'login.html'; }
+
+    // Load user data
+    const user = getUser();
+    if (user) {
+      document.getElementById('sidebarName').textContent = user.name;
+      document.getElementById('sidebarPlan').textContent = user.plan;
+      document.getElementById('sidebarAvatar').textContent = user.avatar;
+      document.getElementById('topbarAvatar').textContent = user.avatar;
+      document.getElementById('metricBalance').textContent = '$' + (user.balance || 52840).toLocaleString('en-US', {minimumFractionDigits:2});
+      const profit = user.profit || 2840;
+      const pct = ((profit / (user.balance - profit)) * 100).toFixed(2);
+      document.getElementById('metricProfit').textContent = `▲ +$${profit.toLocaleString()} (+${pct}%)`;
+      document.getElementById('metricDailyDD').textContent = (user.dailyDD || 1.2) + '%';
+      document.getElementById('metricMaxDD').textContent = (user.maxDD || 4.8) + '%';
+    }
+
+    // Page switching
+    function showPage(pageId) {
+      document.querySelectorAll('.dash-page').forEach(p => p.classList.remove('active'));
+      document.querySelectorAll('.sidebar-link').forEach(l => l.classList.remove('active'));
+      document.getElementById('page-' + pageId).classList.add('active');
+      const link = document.querySelector(`[data-page="${pageId}"]`);
+      if (link) link.classList.add('active');
+      const titles = { overview:'Overview', trading:'Trading Stats', trades:'Trade History', payouts:'Payouts', certificates:'Certificates' };
+      document.getElementById('pageTitle').textContent = titles[pageId] || pageId;
+    }
+    document.querySelectorAll('[data-page]').forEach(link => {
+      link.addEventListener('click', (e) => { e.preventDefault(); showPage(link.dataset.page); });
+    });
+
+    // Sidebar toggle mobile
+    function toggleSidebar() {
+      document.getElementById('sidebar').classList.toggle('open');
+    }
+
+    // Generate equity curve
+    function generateCurve() {
+      const points = [];
+      let val = 50000;
+      for (let i = 0; i <= 30; i++) {
+        val += (Math.random() - 0.35) * 600;
+        val = Math.max(49000, val);
+        points.push(val);
+      }
+      const min = Math.min(...points) - 200;
+      const max = Math.max(...points) + 200;
+      const w = 800, h = 200;
+      const pts = points.map((v, i) => {
+        const x = (i / (points.length - 1)) * w;
+        const y = h - ((v - min) / (max - min)) * h;
+        return `${x},${y}`;
+      });
+      const linePath = 'M ' + pts.join(' L ');
+      const areaPath = 'M 0,' + h + ' L ' + pts.join(' L ') + ' L ' + w + ',' + h + ' Z';
+      document.getElementById('equityLine').setAttribute('d', linePath);
+      document.getElementById('equityArea').setAttribute('d', areaPath);
+    }
+    generateCurve();
+
+    function setPeriod(btn, period) {
+      document.querySelectorAll('.active-period').forEach(b => b.classList.remove('active-period'));
+      btn.classList.add('active-period');
+      generateCurve();
+    }
+
+    // Populate trade history
+    const instruments = ['XAUUSD','EURUSD','GBPUSD','NAS100','BTCUSD','USDJPY','USDCAD'];
+    const trades = [];
+    for (let i = 0; i < 20; i++) {
+      const dir = Math.random() > 0.5 ? 'BUY' : 'SELL';
+      const sym = instruments[Math.floor(Math.random() * instruments.length)];
+      const pnl = Math.round((Math.random() - 0.35) * 600);
+      const date = new Date(Date.now() - i * 24 * 3600000);
+      const open = (1.0800 + Math.random() * 0.05).toFixed(5);
+      const close = (parseFloat(open) + (pnl > 0 ? 0.002 : -0.002)).toFixed(5);
+      trades.push({ date: date.toLocaleDateString(), sym, dir, lots: (0.1 + Math.random() * 0.9).toFixed(2), open, close, pnl });
+    }
+    const tbody = document.getElementById('tradeHistoryBody');
+    if (tbody) {
+      trades.forEach(t => {
+        const row = document.createElement('tr');
+        row.innerHTML = `<td>${t.date}</td><td><strong>${t.sym}</strong></td><td><span class="badge badge-${t.dir==='BUY'?'green':'red'}">${t.dir}</span></td><td>${t.lots}</td><td>${t.open}</td><td>${t.close}</td><td class="${t.pnl>=0?'green':'red'}">${t.pnl>=0?'+':''}$${Math.abs(t.pnl)}</td>`;
+        tbody.appendChild(row);
+      });
+    }
+
+    function requestPayout() {
+      const amount = document.getElementById('payoutAmount').value;
+      if (!amount || amount < 50) { showToast('Minimum payout is $50', 'error'); return; }
+      showToast('Payout request submitted! Processing in 48 hours.', 'success');
+      document.getElementById('payoutAmount').value = '';
+    }
+  </script>
+</body>
+</html>

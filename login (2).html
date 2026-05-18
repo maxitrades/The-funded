@@ -1,0 +1,141 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Login – The Funded Traders</title>
+  <link rel="icon" type="image/svg+xml" href="assets/logo.svg">
+  <link rel="stylesheet" href="css/main.css">
+  <link rel="stylesheet" href="css/auth.css">
+</head>
+<body class="auth-body">
+  <div class="cursor"></div>
+  <div class="cursor-follower"></div>
+  <div class="auth-bg">
+    <div class="auth-grid"></div>
+    <div class="auth-glow"></div>
+  </div>
+
+  <div class="auth-container">
+    <a href="index.html" class="auth-logo">
+      <img src="assets/logo.svg" alt="The Funded Traders" style="height:44px;" onerror="this.style.display='none'">
+      <div class="nav-logo-text">The Funded Traders <span>Elite Prop Trading</span></div>
+    </a>
+
+    <div class="auth-card">
+      <div class="auth-header">
+        <h2>Welcome Back</h2>
+        <p class="dim">Log in to your trading dashboard</p>
+      </div>
+
+      <div id="loginError" class="alert alert-error" style="display:none;"></div>
+
+      <form id="loginForm" onsubmit="handleLogin(event)">
+        <div class="form-group">
+          <label class="form-label">Email Address</label>
+          <input type="email" class="form-input" id="loginEmail" placeholder="you@example.com" required autocomplete="email">
+        </div>
+        <div class="form-group">
+          <label class="form-label">Password</label>
+          <div style="position:relative;">
+            <input type="password" class="form-input" id="loginPassword" placeholder="••••••••" required autocomplete="current-password">
+            <button type="button" onclick="togglePassword('loginPassword')" style="position:absolute;right:14px;top:50%;transform:translateY(-50%);background:none;border:none;color:var(--white-dim);cursor:pointer;font-size:0.85rem;">Show</button>
+          </div>
+        </div>
+        <div style="display:flex;justify-content:flex-end;margin-bottom:20px;">
+          <a href="forgot-password.html" style="font-size:0.8rem;color:var(--gold);text-decoration:none;">Forgot password?</a>
+        </div>
+        <button type="submit" class="btn btn-gold btn-full btn-lg" id="loginBtn">
+          <span id="loginBtnText">Login to Dashboard</span>
+          <span id="loginSpinner" class="spinner" style="display:none;"></span>
+        </button>
+      </form>
+
+      <div class="auth-divider"><span>or</span></div>
+
+      <div style="text-align:center;">
+        <p class="dim" style="font-size:0.875rem;">Don't have an account? <a href="signup.html" style="color:var(--gold);text-decoration:none;font-weight:600;">Create one free</a></p>
+      </div>
+
+      <div class="demo-login">
+        <p class="dim" style="font-size:0.75rem;margin-bottom:8px;">Demo credentials (for testing):</p>
+        <button onclick="demoLogin()" class="btn btn-ghost btn-sm btn-full">Use Demo Account</button>
+      </div>
+    </div>
+  </div>
+
+  <script src="js/main.js"></script>
+  <script>
+    function togglePassword(id) {
+      const input = document.getElementById(id);
+      const btn = input.nextElementSibling;
+      if (input.type === 'password') { input.type = 'text'; btn.textContent = 'Hide'; }
+      else { input.type = 'password'; btn.textContent = 'Show'; }
+    }
+
+    function handleLogin(e) {
+      e.preventDefault();
+      const email = document.getElementById('loginEmail').value;
+      const password = document.getElementById('loginPassword').value;
+      const btn = document.getElementById('loginBtn');
+      const btnText = document.getElementById('loginBtnText');
+      const spinner = document.getElementById('loginSpinner');
+      const errorDiv = document.getElementById('loginError');
+
+      btnText.style.display = 'none';
+      spinner.style.display = 'inline-block';
+      btn.disabled = true;
+      errorDiv.style.display = 'none';
+
+      setTimeout(() => {
+        // Demo login check
+        if (email === 'demo@thefundedtraders.com' && password === 'Demo1234!') {
+          localStorage.setItem('tft_logged_in', 'true');
+          localStorage.setItem('tft_user', JSON.stringify({
+            name: 'Demo Trader',
+            email: email,
+            plan: 'Endurance $50K',
+            avatar: 'DT',
+            phase: 'Phase 1',
+            balance: 52840,
+            equity: 52840,
+            profit: 2840,
+            dailyDD: 1.2,
+            maxDD: 4.8
+          }));
+          window.location.href = 'dashboard.html';
+        } else if (email && password.length >= 6) {
+          // Simulate successful login for any valid-looking credentials
+          localStorage.setItem('tft_logged_in', 'true');
+          const name = email.split('@')[0].replace(/[^a-zA-Z]/g, ' ').replace(/\b\w/g, c => c.toUpperCase());
+          localStorage.setItem('tft_user', JSON.stringify({
+            name: name,
+            email: email,
+            plan: 'Endurance $50K',
+            avatar: name.substring(0,2).toUpperCase(),
+            phase: 'Phase 1',
+            balance: 52840,
+            equity: 52840,
+            profit: 2840,
+            dailyDD: 1.2,
+            maxDD: 4.8
+          }));
+          window.location.href = 'dashboard.html';
+        } else {
+          errorDiv.textContent = 'Invalid email or password. Please try again.';
+          errorDiv.style.display = 'flex';
+          btnText.style.display = 'inline';
+          spinner.style.display = 'none';
+          btn.disabled = false;
+        }
+      }, 1200);
+    }
+
+    function demoLogin() {
+      document.getElementById('loginEmail').value = 'demo@thefundedtraders.com';
+      document.getElementById('loginPassword').value = 'Demo1234!';
+      document.getElementById('loginForm').dispatchEvent(new Event('submit'));
+    }
+  </script>
+</body>
+</html>

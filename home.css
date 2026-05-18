@@ -1,0 +1,277 @@
+/* HOME PAGE STYLES */
+
+/* Hero */
+.hero {
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  position: relative;
+  overflow: hidden;
+  padding: 0 60px;
+}
+.hero-bg {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+}
+.hero-grid {
+  position: absolute;
+  inset: 0;
+  background-image:
+    linear-gradient(rgba(212,175,55,0.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(212,175,55,0.04) 1px, transparent 1px);
+  background-size: 60px 60px;
+}
+.hero-glow {
+  position: absolute;
+  top: 20%;
+  right: 10%;
+  width: 600px;
+  height: 600px;
+  background: radial-gradient(circle, rgba(212,175,55,0.08) 0%, transparent 70%);
+  border-radius: 50%;
+}
+.hero-content {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 80px;
+  align-items: center;
+  position: relative;
+  z-index: 1;
+  padding-top: 80px;
+  padding-bottom: 60px;
+}
+.hero-title {
+  font-size: clamp(2.8rem, 5vw, 5rem);
+  line-height: 1.0;
+  margin-bottom: 24px;
+}
+.hero-sub {
+  color: var(--white-dim);
+  font-size: 1.1rem;
+  line-height: 1.8;
+  margin-bottom: 36px;
+  max-width: 520px;
+}
+.hero-sub strong { color: var(--white); }
+.hero-buttons { display: flex; gap: 16px; flex-wrap: wrap; margin-bottom: 48px; }
+.hero-trust { display: flex; align-items: center; gap: 28px; }
+.trust-item { text-align: center; }
+.trust-num { font-family: 'Bebas Neue', sans-serif; font-size: 1.8rem; color: var(--gold); display: block; }
+.trust-label { font-size: 0.7rem; color: var(--white-dim); text-transform: uppercase; letter-spacing: 0.1em; }
+.trust-divider { width: 1px; height: 40px; background: var(--border); }
+
+/* Hero Mockup */
+.hero-card-wrap { display: flex; justify-content: flex-end; }
+.hero-mockup {
+  background: var(--dark2);
+  border: 1px solid var(--border-bright);
+  border-radius: 20px;
+  padding: 28px;
+  width: 100%;
+  max-width: 380px;
+  box-shadow: var(--glow-strong);
+  animation: float 5s ease-in-out infinite;
+}
+.mockup-header {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 24px;
+  font-size: 0.8rem;
+  color: var(--white-dim);
+}
+.mockup-dot { width: 10px; height: 10px; border-radius: 50%; }
+.mockup-dot.red { background: #FF5F57; }
+.mockup-dot.gold { background: var(--gold); }
+.mockup-dot.green { background: #28CA41; }
+.mockup-balance { margin-bottom: 24px; }
+.mockup-chart { margin-bottom: 20px; border-radius: 8px; overflow: hidden; }
+.mockup-stats {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 12px;
+  margin-bottom: 20px;
+}
+.mockup-stat { display: flex; flex-direction: column; gap: 2px; font-size: 0.8rem; background: var(--dark3); padding: 10px 12px; border-radius: 8px; }
+.mockup-footer { display: flex; justify-content: space-between; align-items: center; }
+
+/* Stats Bar */
+.stats-bar {
+  padding: 60px;
+  background: var(--dark2);
+  border-top: 1px solid var(--border);
+  border-bottom: 1px solid var(--border);
+}
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0;
+}
+.stat-item {
+  text-align: center;
+  padding: 20px;
+  border-right: 1px solid var(--border);
+}
+.stat-item:last-child { border-right: none; }
+.stat-item .stat-number { font-size: 2.8rem; }
+
+/* Challenges grid */
+.challenges-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 24px;
+}
+.challenge-card {
+  background: var(--dark2);
+  border: 1px solid var(--border);
+  border-radius: 20px;
+  padding: 36px;
+  position: relative;
+  transition: var(--transition);
+}
+.challenge-card:hover { border-color: var(--border-bright); transform: translateY(-6px); box-shadow: var(--glow); }
+.challenge-card.featured {
+  border-color: var(--gold-dark);
+  background: linear-gradient(135deg, var(--dark2) 0%, rgba(212,175,55,0.05) 100%);
+  box-shadow: var(--glow);
+}
+.challenge-badge {
+  position: absolute;
+  top: -12px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: var(--dark3);
+  border: 1px solid var(--border);
+  color: var(--white-dim);
+  font-size: 0.7rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  padding: 4px 14px;
+  border-radius: 100px;
+  white-space: nowrap;
+}
+.challenge-badge.gold-badge { background: var(--gold); color: var(--black); border-color: var(--gold); }
+.challenge-badge.blue-badge { background: rgba(68,136,255,0.15); color: var(--blue); border-color: rgba(68,136,255,0.3); }
+.challenge-icon { font-size: 2.5rem; margin-bottom: 16px; }
+.challenge-card h3 { font-size: 1.4rem; margin-bottom: 10px; }
+.challenge-desc { color: var(--white-dim); font-size: 0.875rem; line-height: 1.7; margin-bottom: 20px; }
+.challenge-sizes { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+.challenge-sizes span {
+  padding: 4px 12px;
+  border-radius: 6px;
+  font-size: 0.75rem;
+  font-weight: 600;
+  background: var(--dark3);
+  border: 1px solid var(--border);
+  color: var(--white-dim);
+  cursor: pointer;
+  transition: var(--transition);
+}
+.challenge-sizes span.active, .challenge-sizes span:hover { border-color: var(--gold); color: var(--gold); background: rgba(212,175,55,0.05); }
+.challenge-rules { margin-bottom: 28px; }
+.rule-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 10px 0;
+  border-bottom: 1px solid rgba(255,255,255,0.05);
+  font-size: 0.875rem;
+}
+.rule-row:last-child { border-bottom: none; }
+.rule-row span:first-child { color: var(--white-dim); }
+.challenge-price { font-size: 0.875rem; color: var(--white-dim); margin-bottom: 20px; }
+.challenge-price span { font-family: 'Bebas Neue',sans-serif; font-size: 1.8rem; color: var(--white); }
+
+/* Steps */
+.how-section { background: var(--dark2); border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+.steps-grid {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr auto 1fr auto 1fr;
+  gap: 0;
+  align-items: start;
+}
+.step-card {
+  background: var(--dark3);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px 24px;
+  text-align: center;
+  transition: var(--transition);
+}
+.step-card:hover { border-color: var(--border-bright); box-shadow: var(--glow); }
+.step-num {
+  font-family: 'Bebas Neue', sans-serif;
+  font-size: 3rem;
+  color: rgba(212,175,55,0.2);
+  line-height: 1;
+  margin-bottom: 8px;
+}
+.step-icon { font-size: 2rem; margin-bottom: 12px; }
+.step-card h3 { font-size: 1rem; margin-bottom: 8px; }
+.step-card p { color: var(--white-dim); font-size: 0.85rem; line-height: 1.7; }
+.step-connector {
+  width: 40px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
+  padding-top: 56px;
+  color: var(--gold);
+  font-size: 1.4rem;
+  opacity: 0.4;
+}
+.step-connector::after { content: '→'; }
+
+/* Testimonials */
+.testimonials-section { background: var(--dark); }
+.testimonials-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+.testimonial-card {
+  background: var(--dark2);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 32px;
+  transition: var(--transition);
+}
+.testimonial-card:hover { border-color: var(--border-bright); transform: translateY(-4px); }
+.testimonial-stars { color: var(--gold); font-size: 0.9rem; margin-bottom: 16px; }
+.testimonial-card p { color: var(--white-dim); font-size: 0.9rem; line-height: 1.8; margin-bottom: 24px; font-style: italic; }
+.testimonial-author { display: flex; align-items: center; gap: 12px; }
+.author-avatar {
+  width: 40px; height: 40px;
+  border-radius: 50%;
+  background: linear-gradient(135deg, var(--gold-dark), var(--gold));
+  display: flex; align-items: center; justify-content: center;
+  font-weight: 700; font-size: 0.8rem; color: var(--black);
+  flex-shrink: 0;
+}
+
+/* CTA Banner */
+.cta-banner { background: linear-gradient(135deg, var(--dark2) 0%, rgba(212,175,55,0.06) 100%); border-top: 1px solid var(--border); }
+.cta-inner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+  flex-wrap: wrap;
+}
+.cta-inner h2 { font-size: 2.2rem; margin-bottom: 8px; }
+
+/* Responsive */
+@media (max-width: 1024px) {
+  .hero-content { grid-template-columns: 1fr; gap: 48px; padding-top: 40px; }
+  .hero-card-wrap { justify-content: center; }
+  .stats-grid { grid-template-columns: repeat(3, 1fr); }
+  .stat-item:nth-child(3) { border-right: none; }
+  .challenges-grid { grid-template-columns: 1fr; }
+  .steps-grid { grid-template-columns: 1fr; }
+  .step-connector { display: none; }
+  .testimonials-grid { grid-template-columns: 1fr; }
+}
+@media (max-width: 768px) {
+  .hero { padding: 0 20px; }
+  .stats-bar { padding: 40px 20px; }
+  .stats-grid { grid-template-columns: repeat(2, 1fr); }
+  .stat-item:nth-child(5) { grid-column: span 2; border-right: none; }
+  .cta-inner { flex-direction: column; text-align: center; }
+}
