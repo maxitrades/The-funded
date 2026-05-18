@@ -1,0 +1,1209 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>Checkout – The Funded Traders</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet"/>
+<!-- Stripe JS -->
+<script src="https://js.stripe.com/v3/"></script>
+<!-- QR Code library -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/qrcodejs/1.0.0/qrcode.min.js"></script>
+<style>
+  :root {
+    --bg:       #07090f;
+    --bg2:      #0c0f1a;
+    --bg3:      #111520;
+    --surface:  #151a28;
+    --surface2: #1c2235;
+    --border:   rgba(255,255,255,0.07);
+    --border2:  rgba(255,255,255,0.13);
+    --gold:     #f0c040;
+    --gold2:    #e8a820;
+    --green:    #22d985;
+    --red:      #f04060;
+    --text:     #e8ecf4;
+    --text2:    #8b93a8;
+    --text3:    #4a5268;
+    --radius:   12px;
+    --radius-lg:20px;
+  }
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+  html { scroll-behavior: smooth; }
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    min-height: 100vh;
+    overflow-x: hidden;
+  }
+  h1,h2,h3,h4 { font-family: 'Syne', sans-serif; }
+
+  /* ── TOP BAR ── */
+  .topbar {
+    background: var(--bg2);
+    border-bottom: 1px solid var(--border);
+    height: 58px;
+    display: flex;
+    align-items: center;
+    padding: 0 32px;
+    justify-content: space-between;
+  }
+  .logo { display:flex; align-items:center; gap:10px; text-decoration:none; }
+  .logo-mark {
+    width:32px; height:32px;
+    background: linear-gradient(135deg,var(--gold),var(--gold2));
+    border-radius:7px;
+    display:flex; align-items:center; justify-content:center;
+    font-family:'Syne',sans-serif; font-weight:800; font-size:13px; color:#07090f;
+  }
+  .logo-text { font-family:'Syne',sans-serif; font-weight:700; font-size:14px; color:var(--text); }
+  .logo-text span { color:var(--gold); }
+  .topbar-right { display:flex; align-items:center; gap:16px; font-size:12px; color:var(--text3); }
+  .secure-badge { display:flex; align-items:center; gap:6px; color:var(--green); font-size:12px; font-weight:600; }
+
+  /* ── LAYOUT ── */
+  .checkout-wrap {
+    max-width: 1080px;
+    margin: 0 auto;
+    padding: 48px 24px 80px;
+    display: grid;
+    grid-template-columns: 1fr 380px;
+    gap: 32px;
+    align-items: start;
+  }
+
+  /* ── STEPS ── */
+  .steps-bar {
+    display: flex;
+    align-items: center;
+    gap: 0;
+    margin-bottom: 36px;
+  }
+  .step-dot {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-size: 13px;
+    font-weight: 600;
+    color: var(--text3);
+    position: relative;
+  }
+  .step-dot.active { color: var(--text); }
+  .step-dot.done { color: var(--green); }
+  .step-circle {
+    width: 30px; height: 30px;
+    border-radius: 50%;
+    border: 2px solid var(--border2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 12px; font-weight: 700;
+    background: var(--bg3);
+    flex-shrink: 0;
+    transition: all 0.3s;
+  }
+  .step-dot.active .step-circle { border-color: var(--gold); color: var(--gold); background: rgba(240,192,64,0.08); }
+  .step-dot.done .step-circle { border-color: var(--green); background: rgba(34,217,133,0.1); color: var(--green); }
+  .step-line { flex: 1; height: 1px; background: var(--border); margin: 0 12px; min-width: 32px; }
+
+  /* ── CARD ── */
+  .card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+  }
+  .card-header {
+    padding: 20px 28px;
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .card-header h3 { font-size: 16px; font-weight: 700; }
+  .card-header span { font-size: 12px; color: var(--text3); }
+  .card-body { padding: 28px; }
+
+  /* ── PAYMENT METHOD TABS ── */
+  .method-tabs {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+    gap: 8px;
+    margin-bottom: 28px;
+  }
+  .method-tab {
+    border: 1px solid var(--border);
+    background: var(--bg3);
+    border-radius: var(--radius);
+    padding: 14px 10px;
+    text-align: center;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 6px;
+  }
+  .method-tab:hover { border-color: var(--border2); background: var(--surface); }
+  .method-tab.active {
+    border-color: var(--gold);
+    background: rgba(240,192,64,0.06);
+    box-shadow: 0 0 0 1px rgba(240,192,64,0.15);
+  }
+  .method-icon { font-size: 22px; }
+  .method-name { font-size: 11px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.5px; }
+  .method-tab.active .method-name { color: var(--gold); }
+
+  /* ── STRIPE FORM ── */
+  .stripe-section { display: block; }
+  .crypto-section { display: none; }
+
+  .form-group { margin-bottom: 18px; }
+  .form-label {
+    display: block;
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text2);
+    margin-bottom: 8px;
+  }
+  .form-input {
+    width: 100%;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 13px 16px;
+    font-size: 14px;
+    color: var(--text);
+    font-family: 'DM Sans', sans-serif;
+    outline: none;
+    transition: border-color 0.2s;
+  }
+  .form-input:focus { border-color: var(--gold); }
+  .form-input::placeholder { color: var(--text3); }
+  .form-row { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+
+  /* Stripe element container */
+  .stripe-element {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 14px 16px;
+    transition: border-color 0.2s;
+  }
+  .stripe-element.focused { border-color: var(--gold); }
+  .stripe-element-label {
+    font-size: 11px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.8px;
+    color: var(--text2);
+    margin-bottom: 10px;
+    display: block;
+  }
+
+  /* ── CRYPTO SECTION ── */
+  .crypto-tabs {
+    display: flex;
+    gap: 6px;
+    margin-bottom: 24px;
+  }
+  .crypto-tab {
+    padding: 8px 18px;
+    border-radius: 8px;
+    font-size: 13px;
+    font-weight: 700;
+    cursor: pointer;
+    border: 1px solid var(--border);
+    background: var(--bg3);
+    color: var(--text2);
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .crypto-tab.active { border-color: var(--gold); background: rgba(240,192,64,0.08); color: var(--gold); }
+  .crypto-tab:hover:not(.active) { border-color: var(--border2); color: var(--text); }
+
+  .crypto-panel { display: none; }
+  .crypto-panel.active { display: block; }
+
+  .qr-wrap {
+    display: flex;
+    gap: 24px;
+    align-items: flex-start;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    padding: 24px;
+    margin-bottom: 20px;
+  }
+  .qr-box {
+    width: 120px; height: 120px;
+    background: white;
+    border-radius: 8px;
+    flex-shrink: 0;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 6px;
+  }
+  .qr-box canvas, .qr-box img { width: 100% !important; height: 100% !important; }
+  .qr-info { flex: 1; }
+  .qr-network {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 4px 10px;
+    border-radius: 100px;
+    font-size: 10px;
+    font-weight: 700;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+    margin-bottom: 10px;
+  }
+  .network-trc20 { background: rgba(34,217,133,0.1); color: var(--green); border: 1px solid rgba(34,217,133,0.2); }
+  .network-erc20 { background: rgba(99,102,241,0.1); color: #818cf8; border: 1px solid rgba(99,102,241,0.2); }
+  .network-btc { background: rgba(240,192,64,0.1); color: var(--gold); border: 1px solid rgba(240,192,64,0.2); }
+  .network-eth { background: rgba(99,102,241,0.1); color: #818cf8; border: 1px solid rgba(99,102,241,0.2); }
+  .qr-label { font-size: 11px; color: var(--text3); margin-bottom: 6px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+  .qr-address {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 11px;
+    color: var(--text);
+    word-break: break-all;
+    line-height: 1.6;
+    margin-bottom: 10px;
+  }
+  .copy-btn {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    padding: 7px 14px;
+    border-radius: 7px;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    font-size: 12px;
+    font-weight: 600;
+    color: var(--text2);
+    cursor: pointer;
+    transition: all 0.2s;
+  }
+  .copy-btn:hover { background: var(--surface); color: var(--text); }
+  .copy-btn.copied { color: var(--green); border-color: rgba(34,217,133,0.3); }
+
+  .crypto-amount-box {
+    background: rgba(240,192,64,0.05);
+    border: 1px solid rgba(240,192,64,0.2);
+    border-radius: var(--radius);
+    padding: 16px 20px;
+    margin-bottom: 20px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .crypto-amount-label { font-size: 12px; color: var(--text2); }
+  .crypto-amount-val {
+    font-family: 'JetBrains Mono', monospace;
+    font-size: 15px;
+    font-weight: 600;
+    color: var(--gold);
+  }
+
+  .crypto-steps-list { list-style: none; }
+  .crypto-steps-list li {
+    display: flex;
+    gap: 12px;
+    align-items: flex-start;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+    color: var(--text2);
+    line-height: 1.5;
+  }
+  .crypto-steps-list li:last-child { border-bottom: none; }
+  .crypto-step-num {
+    width: 22px; height: 22px;
+    border-radius: 50%;
+    background: var(--surface2);
+    border: 1px solid var(--border2);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 11px; font-weight: 700; color: var(--gold);
+    flex-shrink: 0;
+    margin-top: 1px;
+  }
+
+  .confirm-payment-btn {
+    width: 100%;
+    padding: 15px;
+    border-radius: var(--radius);
+    background: linear-gradient(135deg, var(--gold), var(--gold2));
+    color: #07090f;
+    font-family: 'Syne', sans-serif;
+    font-size: 15px;
+    font-weight: 700;
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    box-shadow: 0 4px 24px rgba(240,192,64,0.25);
+    margin-top: 24px;
+  }
+  .confirm-payment-btn:hover { transform: translateY(-1px); box-shadow: 0 6px 32px rgba(240,192,64,0.35); }
+  .confirm-payment-btn:active { transform: translateY(0); }
+  .confirm-payment-btn:disabled { opacity: 0.6; cursor: not-allowed; transform: none; }
+
+  /* ── ORDER SUMMARY ── */
+  .order-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius-lg);
+    overflow: hidden;
+    position: sticky;
+    top: 24px;
+  }
+  .order-header {
+    background: var(--surface2);
+    border-bottom: 1px solid var(--border);
+    padding: 18px 24px;
+  }
+  .order-header h3 { font-size: 14px; font-weight: 700; color: var(--text2); text-transform: uppercase; letter-spacing: 0.8px; }
+  .order-body { padding: 24px; }
+
+  .order-plan-name {
+    font-family: 'Syne', sans-serif;
+    font-size: 20px;
+    font-weight: 800;
+    color: var(--text);
+    margin-bottom: 4px;
+  }
+  .order-plan-sub { font-size: 13px; color: var(--text3); margin-bottom: 20px; }
+
+  .order-specs { margin-bottom: 20px; }
+  .order-spec {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 9px 0;
+    border-bottom: 1px solid var(--border);
+    font-size: 13px;
+  }
+  .order-spec:last-child { border-bottom: none; }
+  .order-spec-label { color: var(--text3); }
+  .order-spec-val { color: var(--text); font-weight: 600; font-family: 'JetBrains Mono', monospace; font-size: 12px; }
+  .order-spec-val.green { color: var(--green); }
+
+  .order-total {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px 18px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 16px;
+  }
+  .order-total-label { font-size: 13px; font-weight: 600; color: var(--text2); }
+  .order-total-price {
+    font-family: 'Syne', sans-serif;
+    font-size: 26px;
+    font-weight: 800;
+    color: var(--gold);
+  }
+  .order-refund-note {
+    display: flex;
+    gap: 8px;
+    align-items: flex-start;
+    background: rgba(34,217,133,0.05);
+    border: 1px solid rgba(34,217,133,0.15);
+    border-radius: 8px;
+    padding: 12px 14px;
+    font-size: 12px;
+    color: var(--text2);
+    line-height: 1.5;
+  }
+  .order-refund-note .icon { color: var(--green); font-size: 14px; flex-shrink: 0; margin-top: 1px; }
+
+  .trust-list { margin-top: 20px; display: flex; flex-direction: column; gap: 8px; }
+  .trust-item { display: flex; align-items: center; gap: 10px; font-size: 12px; color: var(--text3); }
+  .trust-item .ti { color: var(--green); font-size: 14px; }
+
+  /* ── CONFIRMATION SCREEN ── */
+  .confirm-screen {
+    display: none;
+    text-align: center;
+    padding: 60px 32px;
+  }
+  .confirm-icon {
+    width: 80px; height: 80px;
+    border-radius: 50%;
+    background: rgba(34,217,133,0.1);
+    border: 2px solid rgba(34,217,133,0.3);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 36px;
+    margin: 0 auto 24px;
+    animation: popIn 0.5s cubic-bezier(0.34,1.56,0.64,1) forwards;
+  }
+  @keyframes popIn { from{transform:scale(0);opacity:0} to{transform:scale(1);opacity:1} }
+  .confirm-screen h2 { font-size: 28px; font-weight: 800; letter-spacing: -1px; margin-bottom: 10px; }
+  .confirm-screen p { font-size: 14px; color: var(--text2); max-width: 380px; margin: 0 auto 28px; line-height: 1.7; }
+  .order-ref {
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 20px;
+    margin: 0 auto 28px;
+    max-width: 300px;
+  }
+  .order-ref-label { font-size: 11px; color: var(--text3); text-transform: uppercase; letter-spacing: 0.5px; margin-bottom: 4px; }
+  .order-ref-val { font-family: 'JetBrains Mono', monospace; font-size: 16px; font-weight: 600; color: var(--gold); }
+  .next-steps-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; max-width: 440px; margin: 0 auto; }
+  .next-step-item {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    text-align: left;
+  }
+  .next-step-icon { font-size: 20px; margin-bottom: 8px; }
+  .next-step-title { font-size: 13px; font-weight: 700; color: var(--text); margin-bottom: 4px; }
+  .next-step-desc { font-size: 11px; color: var(--text3); line-height: 1.5; }
+
+  /* ── CRYPTO PENDING SCREEN ── */
+  .pending-screen {
+    display: none;
+    padding: 40px 32px;
+    text-align: center;
+  }
+  .pending-icon {
+    width: 72px; height: 72px;
+    border-radius: 50%;
+    background: rgba(240,192,64,0.1);
+    border: 2px solid rgba(240,192,64,0.3);
+    display: flex; align-items: center; justify-content: center;
+    font-size: 30px;
+    margin: 0 auto 20px;
+  }
+  .pending-screen h2 { font-size: 22px; font-weight: 800; margin-bottom: 8px; }
+  .pending-screen p { font-size: 13px; color: var(--text2); max-width: 380px; margin: 0 auto 24px; line-height: 1.6; }
+  .timer-box {
+    background: var(--bg3);
+    border: 1px solid rgba(240,192,64,0.2);
+    border-radius: var(--radius);
+    padding: 14px 24px;
+    display: inline-flex;
+    align-items: center;
+    gap: 10px;
+    margin-bottom: 24px;
+  }
+  .timer-label { font-size: 12px; color: var(--text2); }
+  .timer-val { font-family: 'JetBrains Mono', monospace; font-size: 20px; font-weight: 600; color: var(--gold); }
+
+  /* ── SPINNER ── */
+  .spinner {
+    width: 18px; height: 18px;
+    border: 2px solid rgba(7,9,15,0.3);
+    border-top-color: #07090f;
+    border-radius: 50%;
+    animation: spin 0.7s linear infinite;
+    display: none;
+  }
+  @keyframes spin { to { transform: rotate(360deg); } }
+
+  /* ── CARD ICONS ── */
+  .card-icons { display: flex; gap: 8px; margin-bottom: 20px; }
+  .card-icon {
+    height: 28px;
+    padding: 4px 10px;
+    background: var(--bg3);
+    border: 1px solid var(--border);
+    border-radius: 5px;
+    font-size: 11px;
+    font-weight: 700;
+    color: var(--text2);
+    display: flex;
+    align-items: center;
+  }
+
+  /* ── ERROR MESSAGE ── */
+  .error-msg {
+    background: rgba(240,64,96,0.08);
+    border: 1px solid rgba(240,64,96,0.25);
+    border-radius: 8px;
+    padding: 10px 14px;
+    font-size: 13px;
+    color: var(--red);
+    margin-top: 12px;
+    display: none;
+  }
+
+  /* ── NOTICE ── */
+  .notice {
+    background: rgba(240,192,64,0.05);
+    border: 1px solid rgba(240,192,64,0.2);
+    border-radius: 8px;
+    padding: 12px 16px;
+    font-size: 12px;
+    color: var(--text2);
+    margin-bottom: 20px;
+    line-height: 1.6;
+  }
+  .notice strong { color: var(--gold); }
+
+  /* ── RESPONSIVE ── */
+  @media (max-width: 768px) {
+    .checkout-wrap { grid-template-columns: 1fr; }
+    .order-card { position: static; }
+    .method-tabs { grid-template-columns: repeat(2,1fr); }
+    .form-row { grid-template-columns: 1fr; }
+    .next-steps-grid { grid-template-columns: 1fr; }
+    .qr-wrap { flex-direction: column; }
+    .crypto-tabs { flex-wrap: wrap; }
+  }
+
+  /* page fade-in */
+  @keyframes fadeUp { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+  .checkout-wrap { animation: fadeUp 0.5s ease forwards; }
+</style>
+</head>
+<body>
+
+<!-- TOP BAR -->
+<div class="topbar">
+  <a href="index.html" class="logo">
+    <div class="logo-mark">TF</div>
+    <span class="logo-text">The <span>Funded</span> Traders</span>
+  </a>
+  <div class="topbar-right">
+    <div class="secure-badge">🔒 Secure Checkout</div>
+    <span>|</span>
+    <span>Need help? <a href="mailto:support@thefundedtraders.com" style="color:var(--gold);text-decoration:none;">support@thefundedtraders.com</a></span>
+  </div>
+</div>
+
+<!-- CHECKOUT LAYOUT -->
+<div class="checkout-wrap">
+
+  <!-- LEFT: PAYMENT FORM -->
+  <div>
+    <!-- STEPS -->
+    <div class="steps-bar">
+      <div class="step-dot active" id="step1">
+        <div class="step-circle">1</div>
+        <span>Payment</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-dot" id="step2">
+        <div class="step-circle">2</div>
+        <span>Verification</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-dot" id="step3">
+        <div class="step-circle">3</div>
+        <span>Account Setup</span>
+      </div>
+      <div class="step-line"></div>
+      <div class="step-dot" id="step4">
+        <div class="step-circle">4</div>
+        <span>Start Trading</span>
+      </div>
+    </div>
+
+    <!-- PAYMENT CARD -->
+    <div class="card" id="paymentCard">
+      <div class="card-header">
+        <h3>Payment Details</h3>
+        <span>All transactions are encrypted</span>
+      </div>
+      <div class="card-body">
+
+        <!-- METHOD SELECTOR -->
+        <div class="method-tabs">
+          <div class="method-tab active" onclick="selectMethod('card',this)">
+            <div class="method-icon">💳</div>
+            <div class="method-name">Card</div>
+          </div>
+          <div class="method-tab" onclick="selectMethod('usdt',this)">
+            <div class="method-icon">💚</div>
+            <div class="method-name">USDT</div>
+          </div>
+          <div class="method-tab" onclick="selectMethod('btc',this)">
+            <div class="method-icon">₿</div>
+            <div class="method-name">Bitcoin</div>
+          </div>
+          <div class="method-tab" onclick="selectMethod('eth',this)">
+            <div class="method-icon">◈</div>
+            <div class="method-name">Ethereum</div>
+          </div>
+        </div>
+
+        <!-- ── STRIPE CARD FORM ── -->
+        <div class="stripe-section" id="stripeSection">
+          <div class="card-icons">
+            <div class="card-icon">VISA</div>
+            <div class="card-icon">MC</div>
+            <div class="card-icon">AMEX</div>
+            <div class="card-icon">3D Secure</div>
+          </div>
+
+          <div class="notice">
+            <strong>💡 Setup required:</strong> Replace <code style="color:var(--gold);font-size:11px;">pk_live_YOUR_KEY</code> in the script with your Stripe publishable key. Create your free account at <a href="https://stripe.com" target="_blank" style="color:var(--gold);">stripe.com</a>
+          </div>
+
+          <div class="form-group">
+            <label class="form-label">Full Name (as on card)</label>
+            <input type="text" class="form-input" id="cardName" placeholder="James Smith" autocomplete="cc-name"/>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Email Address</label>
+            <input type="email" class="form-input" id="cardEmail" placeholder="james@example.com" autocomplete="email"/>
+          </div>
+          <div class="form-group">
+            <span class="stripe-element-label">Card Number</span>
+            <div class="stripe-element" id="cardNumberElement"></div>
+          </div>
+          <div class="form-row">
+            <div class="form-group">
+              <span class="stripe-element-label">Expiry Date</span>
+              <div class="stripe-element" id="cardExpiryElement"></div>
+            </div>
+            <div class="form-group">
+              <span class="stripe-element-label">CVC</span>
+              <div class="stripe-element" id="cardCvcElement"></div>
+            </div>
+          </div>
+
+          <div class="error-msg" id="stripeError"></div>
+
+          <button class="confirm-payment-btn" id="stripePayBtn" onclick="handleStripePayment()">
+            <span id="stripeBtnText">Pay <span id="stripePriceText">$249</span> Securely</span>
+            <div class="spinner" id="stripeSpinner"></div>
+          </button>
+        </div>
+
+        <!-- ── USDT SECTION ── -->
+        <div class="crypto-section" id="usdtSection">
+          <div class="notice">
+            <strong>⚠️ Important:</strong> Send <strong>exactly</strong> the amount shown. Send only on the selected network. Wrong network = lost funds.
+          </div>
+
+          <div class="crypto-tabs">
+            <div class="crypto-tab active" onclick="selectNetwork('trc20',this)">
+              <span>✦</span> TRC-20 (Tron)
+            </div>
+            <div class="crypto-tab" onclick="selectNetwork('erc20',this)">
+              <span>◈</span> ERC-20 (Ethereum)
+            </div>
+          </div>
+
+          <!-- TRC20 -->
+          <div class="crypto-panel active" id="panel-trc20">
+            <div class="crypto-amount-box">
+              <div>
+                <div class="crypto-amount-label">Amount to send (USDT TRC-20)</div>
+              </div>
+              <div class="crypto-amount-val" id="usdtTrc20Amount">249.00 USDT</div>
+            </div>
+            <div class="qr-wrap">
+              <div class="qr-box" id="qr-trc20"></div>
+              <div class="qr-info">
+                <div class="qr-network network-trc20">TRC-20 Network</div>
+                <div class="qr-label">Wallet Address</div>
+                <div class="qr-address" id="addr-trc20">TXYZxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx</div>
+                <button class="copy-btn" onclick="copyAddr('addr-trc20',this)">📋 Copy Address</button>
+              </div>
+            </div>
+          </div>
+          <!-- ERC20 -->
+          <div class="crypto-panel" id="panel-erc20">
+            <div class="crypto-amount-box">
+              <div class="crypto-amount-label">Amount to send (USDT ERC-20)</div>
+              <div class="crypto-amount-val" id="usdtErc20Amount">249.00 USDT</div>
+            </div>
+            <div class="qr-wrap">
+              <div class="qr-box" id="qr-erc20"></div>
+              <div class="qr-info">
+                <div class="qr-network network-erc20">ERC-20 Network</div>
+                <div class="qr-label">Wallet Address</div>
+                <div class="qr-address" id="addr-erc20">0xYOURETHEREUMWALLETADDRESSHERE</div>
+                <button class="copy-btn" onclick="copyAddr('addr-erc20',this)">📋 Copy Address</button>
+              </div>
+            </div>
+          </div>
+
+          <ul class="crypto-steps-list">
+            <li><div class="crypto-step-num">1</div>Open your USDT wallet (Trust Wallet, Binance, etc.)</li>
+            <li><div class="crypto-step-num">2</div>Send the exact amount shown above to the wallet address</li>
+            <li><div class="crypto-step-num">3</div>Click "I've Sent the Payment" below after sending</li>
+            <li><div class="crypto-step-num">4</div>We'll confirm within 30 minutes and email your account details</li>
+          </ul>
+          <button class="confirm-payment-btn" onclick="showPending('USDT')">✓ I've Sent the Payment</button>
+        </div>
+
+        <!-- ── BTC SECTION ── -->
+        <div class="crypto-section" id="btcSection">
+          <div class="notice">
+            <strong>⚠️ Important:</strong> Send <strong>exactly</strong> the BTC amount shown. Bitcoin transactions are irreversible.
+          </div>
+          <div class="crypto-amount-box">
+            <div class="crypto-amount-label">Amount to send (Bitcoin)</div>
+            <div class="crypto-amount-val" id="btcAmount">0.00372 BTC</div>
+          </div>
+          <div class="qr-wrap">
+            <div class="qr-box" id="qr-btc"></div>
+            <div class="qr-info">
+              <div class="qr-network network-btc">Bitcoin Network</div>
+              <div class="qr-label">Bitcoin Wallet Address</div>
+              <div class="qr-address" id="addr-btc">bc1qYOURBITCOINWALLETADDRESSHERE</div>
+              <button class="copy-btn" onclick="copyAddr('addr-btc',this)">📋 Copy Address</button>
+            </div>
+          </div>
+          <ul class="crypto-steps-list">
+            <li><div class="crypto-step-num">1</div>Open your Bitcoin wallet</li>
+            <li><div class="crypto-step-num">2</div>Send the exact BTC amount to the address above</li>
+            <li><div class="crypto-step-num">3</div>Click "I've Sent the Payment" after your transaction is broadcast</li>
+            <li><div class="crypto-step-num">4</div>Confirmation takes ~10-30 min. We'll email your account once confirmed.</li>
+          </ul>
+          <button class="confirm-payment-btn" onclick="showPending('Bitcoin')">✓ I've Sent the Payment</button>
+        </div>
+
+        <!-- ── ETH SECTION ── -->
+        <div class="crypto-section" id="ethSection">
+          <div class="notice">
+            <strong>⚠️ Important:</strong> Send <strong>exactly</strong> the ETH amount shown. Ensure you're on the Ethereum mainnet.
+          </div>
+          <div class="crypto-amount-box">
+            <div class="crypto-amount-label">Amount to send (Ethereum)</div>
+            <div class="crypto-amount-val" id="ethAmount">0.0731 ETH</div>
+          </div>
+          <div class="qr-wrap">
+            <div class="qr-box" id="qr-eth"></div>
+            <div class="qr-info">
+              <div class="qr-network network-eth">Ethereum Mainnet</div>
+              <div class="qr-label">Ethereum Wallet Address</div>
+              <div class="qr-address" id="addr-eth">0xYOURETHEREUMWALLETADDRESSHERE</div>
+              <button class="copy-btn" onclick="copyAddr('addr-eth',this)">📋 Copy Address</button>
+            </div>
+          </div>
+          <ul class="crypto-steps-list">
+            <li><div class="crypto-step-num">1</div>Open MetaMask or your Ethereum wallet</li>
+            <li><div class="crypto-step-num">2</div>Send the exact ETH amount to the address above</li>
+            <li><div class="crypto-step-num">3</div>Click "I've Sent the Payment" after sending</li>
+            <li><div class="crypto-step-num">4</div>We confirm within 1-3 blocks (~15-45 seconds)</li>
+          </ul>
+          <button class="confirm-payment-btn" onclick="showPending('Ethereum')">✓ I've Sent the Payment</button>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- CONFIRMATION SCREEN -->
+    <div class="card" id="confirmCard" style="display:none;">
+      <div class="confirm-screen" id="confirmScreen">
+        <div class="confirm-icon">✓</div>
+        <h2>Payment Confirmed!</h2>
+        <p>Your challenge account is being set up. You'll receive your login credentials via email within the next few minutes.</p>
+        <div class="order-ref">
+          <div class="order-ref-label">Order Reference</div>
+          <div class="order-ref-val" id="orderRef">TF-2024-XXXX</div>
+        </div>
+        <div class="next-steps-grid">
+          <div class="next-step-item">
+            <div class="next-step-icon">📧</div>
+            <div class="next-step-title">Check your email</div>
+            <div class="next-step-desc">Login credentials sent within 5 minutes</div>
+          </div>
+          <div class="next-step-item">
+            <div class="next-step-icon">📊</div>
+            <div class="next-step-title">Access dashboard</div>
+            <div class="next-step-desc">Log in and see your challenge account</div>
+          </div>
+          <div class="next-step-item">
+            <div class="next-step-icon">📖</div>
+            <div class="next-step-title">Read the rules</div>
+            <div class="next-step-desc">Review trading rules before you start</div>
+          </div>
+          <div class="next-step-item">
+            <div class="next-step-icon">🚀</div>
+            <div class="next-step-title">Start trading</div>
+            <div class="next-step-desc">Hit your profit target and get funded!</div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- CRYPTO PENDING SCREEN -->
+    <div class="card" id="pendingCard" style="display:none;">
+      <div class="pending-screen" id="pendingScreen">
+        <div class="pending-icon">⏳</div>
+        <h2>Payment Pending Confirmation</h2>
+        <p>We're waiting to confirm your <span id="pendingCoin">USDT</span> transaction on the blockchain. This usually takes under 30 minutes.</p>
+        <div class="timer-box">
+          <div class="timer-label">Estimated confirmation:</div>
+          <div class="timer-val" id="pendingTimer">29:59</div>
+        </div>
+        <p style="font-size:12px;color:var(--text3);">Once confirmed, you'll receive an email with your account login details at the address you provided. You can close this window.</p>
+        <br/>
+        <p style="font-size:12px;color:var(--text3);">Questions? Contact us on <a href="https://wa.me/1234567890" style="color:var(--gold);text-decoration:none;">WhatsApp</a> or email <a href="mailto:support@thefundedtraders.com" style="color:var(--gold);text-decoration:none;">support@thefundedtraders.com</a></p>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- RIGHT: ORDER SUMMARY -->
+  <div>
+    <div class="order-card">
+      <div class="order-header">
+        <h3>Order Summary</h3>
+      </div>
+      <div class="order-body">
+        <div class="order-plan-name" id="summaryPlanName">The Endurance</div>
+        <div class="order-plan-sub" id="summaryPlanSub">$50,000 Funded Account · 2-Phase Challenge</div>
+
+        <div class="order-specs">
+          <div class="order-spec">
+            <span class="order-spec-label">Account Size</span>
+            <span class="order-spec-val" id="specSize">$50,000</span>
+          </div>
+          <div class="order-spec">
+            <span class="order-spec-label">Phase 1 Target</span>
+            <span class="order-spec-val" id="specTarget">$4,000 (8%)</span>
+          </div>
+          <div class="order-spec">
+            <span class="order-spec-label">Phase 2 Target</span>
+            <span class="order-spec-val" id="specTarget2" style="display:none"></span>
+          </div>
+          <div class="order-spec">
+            <span class="order-spec-label">Daily Drawdown</span>
+            <span class="order-spec-val" id="specDd">$2,500 (5%)</span>
+          </div>
+          <div class="order-spec">
+            <span class="order-spec-label">Profit Split</span>
+            <span class="order-spec-val green" id="specSplit">88%</span>
+          </div>
+          <div class="order-spec">
+            <span class="order-spec-label">Leverage</span>
+            <span class="order-spec-val">1:100</span>
+          </div>
+          <div class="order-spec">
+            <span class="order-spec-label">Min Trading Days</span>
+            <span class="order-spec-val">5 days</span>
+          </div>
+        </div>
+
+        <div class="order-total">
+          <div>
+            <div class="order-total-label">Challenge Fee</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:2px;">One-time payment</div>
+          </div>
+          <div class="order-total-price" id="summaryPrice">$249</div>
+        </div>
+
+        <div class="order-refund-note">
+          <div class="icon">✓</div>
+          <div>This fee is <strong style="color:var(--green)">fully refunded</strong> when you receive your first payout from the funded account.</div>
+        </div>
+
+        <div class="trust-list">
+          <div class="trust-item"><span class="ti">🔒</span> 256-bit SSL encryption</div>
+          <div class="trust-item"><span class="ti">✓</span> Instant account activation</div>
+          <div class="trust-item"><span class="ti">✓</span> Fee refunded on first payout</div>
+          <div class="trust-item"><span class="ti">⚡</span> Payouts within 48 hours</div>
+          <div class="trust-item"><span class="ti">💬</span> 24/7 support on WhatsApp</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div><!-- /checkout-wrap -->
+
+<script>
+// ════════════════════════════════════════════
+// CONFIGURATION — REPLACE THESE WITH YOUR OWN
+// ════════════════════════════════════════════
+const CONFIG = {
+  // ➊ Get your Stripe publishable key from https://dashboard.stripe.com/apikeys
+  stripeKey: 'pk_live_YOUR_STRIPE_PUBLISHABLE_KEY',
+
+  // ➋ Replace with your actual wallet addresses
+  wallets: {
+    usdtTrc20: 'TYOUR_TRON_USDT_WALLET_ADDRESS_HERE',
+    usdtErc20: '0xYOUR_ETHEREUM_USDT_WALLET_ADDRESS_HERE',
+    btc:       'bc1qYOUR_BITCOIN_WALLET_ADDRESS_HERE',
+    eth:       '0xYOUR_ETHEREUM_WALLET_ADDRESS_HERE',
+  }
+};
+
+// ════════════════════════════════════════════
+// PLAN DATA — auto-populated from URL params
+// ════════════════════════════════════════════
+const PLANS = {
+  'endurance-10k':  { name:'The Endurance', sub:'$10,000 · 2-Phase', size:'$10,000', t1:'$800 (8%)',   t2:'$500 (5%)',    dd:'$500 (5%)',   split:'85%', price:79,  priceStr:'$79'  },
+  'endurance-25k':  { name:'The Endurance', sub:'$25,000 · 2-Phase', size:'$25,000', t1:'$2,000 (8%)', t2:'$1,250 (5%)', dd:'$1,250 (5%)', split:'85%', price:159, priceStr:'$159' },
+  'endurance-50k':  { name:'The Endurance', sub:'$50,000 · 2-Phase', size:'$50,000', t1:'$4,000 (8%)', t2:'$2,500 (5%)', dd:'$2,500 (5%)', split:'88%', price:249, priceStr:'$249' },
+  'endurance-100k': { name:'The Endurance', sub:'$100,000 · 2-Phase',size:'$100,000',t1:'$8,000 (8%)', t2:'$5,000 (5%)', dd:'$5,000 (5%)', split:'90%', price:399, priceStr:'$399' },
+  'endurance-200k': { name:'The Endurance', sub:'$200,000 · 2-Phase',size:'$200,000',t1:'$16,000 (8%)',t2:'$10,000 (5%)',dd:'$10,000 (5%)',split:'90%', price:699, priceStr:'$699' },
+  'accelerator-10k':  { name:'The Accelerator', sub:'$10,000 · 1-Phase', size:'$10,000', t1:'$1,000 (10%)',  t2:null, dd:'$500 (5%)',   split:'80%', price:99,  priceStr:'$99'  },
+  'accelerator-25k':  { name:'The Accelerator', sub:'$25,000 · 1-Phase', size:'$25,000', t1:'$2,500 (10%)',  t2:null, dd:'$1,250 (5%)', split:'80%', price:199, priceStr:'$199' },
+  'accelerator-50k':  { name:'The Accelerator', sub:'$50,000 · 1-Phase', size:'$50,000', t1:'$5,000 (10%)',  t2:null, dd:'$2,500 (5%)', split:'80%', price:299, priceStr:'$299' },
+  'accelerator-100k': { name:'The Accelerator', sub:'$100,000 · 1-Phase',size:'$100,000',t1:'$10,000 (10%)', t2:null, dd:'$5,000 (5%)', split:'80%', price:499, priceStr:'$499' },
+  'elite-25k':  { name:'The Elite Path', sub:'$25,000 · 1-Phase', size:'$25,000', t1:'$3,000 (12%)',  t2:null, dd:'None', split:'85%', price:249, priceStr:'$249' },
+  'elite-50k':  { name:'The Elite Path', sub:'$50,000 · 1-Phase', size:'$50,000', t1:'$6,000 (12%)',  t2:null, dd:'None', split:'85%', price:399, priceStr:'$399' },
+  'elite-100k': { name:'The Elite Path', sub:'$100,000 · 1-Phase',size:'$100,000',t1:'$12,000 (12%)', t2:null, dd:'None', split:'85%', price:649, priceStr:'$649' },
+  'elite-200k': { name:'The Elite Path', sub:'$200,000 · 1-Phase',size:'$200,000',t1:'$24,000 (12%)', t2:null, dd:'None', split:'85%', price:999, priceStr:'$999' },
+};
+
+// Read plan from URL param or default
+const params = new URLSearchParams(window.location.search);
+const planKey = params.get('plan') || 'endurance-50k';
+const plan = PLANS[planKey] || PLANS['endurance-50k'];
+let currentPrice = plan.price;
+
+// Populate summary
+document.getElementById('summaryPlanName').textContent = plan.name;
+document.getElementById('summaryPlanSub').textContent   = plan.sub;
+document.getElementById('specSize').textContent         = plan.size;
+document.getElementById('specTarget').textContent       = plan.t1;
+document.getElementById('specDd').textContent           = plan.dd;
+document.getElementById('specSplit').textContent        = plan.split;
+document.getElementById('summaryPrice').textContent     = plan.priceStr;
+document.getElementById('stripePriceText').textContent  = plan.priceStr;
+if (plan.t2) {
+  document.getElementById('specTarget').closest('.order-spec').querySelector('.order-spec-label').textContent = 'Phase 1 Target';
+  const t2row = document.getElementById('specTarget2').closest('.order-spec');
+  t2row.style.display = 'flex';
+  document.getElementById('specTarget2').textContent = plan.t2;
+  document.getElementById('specTarget2').style.display = 'block';
+}
+
+// Crypto amounts (approximate conversions — update with live rates)
+const BTC_RATE  = 67000;
+const ETH_RATE  = 3400;
+document.getElementById('usdtTrc20Amount').textContent = `${currentPrice.toFixed(2)} USDT`;
+document.getElementById('usdtErc20Amount').textContent = `${currentPrice.toFixed(2)} USDT`;
+document.getElementById('btcAmount').textContent       = `${(currentPrice/BTC_RATE).toFixed(6)} BTC`;
+document.getElementById('ethAmount').textContent       = `${(currentPrice/ETH_RATE).toFixed(5)} ETH`;
+
+// Wallet addresses
+document.getElementById('addr-trc20').textContent = CONFIG.wallets.usdtTrc20;
+document.getElementById('addr-erc20').textContent = CONFIG.wallets.usdtErc20;
+document.getElementById('addr-btc').textContent   = CONFIG.wallets.btc;
+document.getElementById('addr-eth').textContent   = CONFIG.wallets.eth;
+
+// ════════════════════════════════════════════
+// QR CODES
+// ════════════════════════════════════════════
+function makeQR(elementId, text) {
+  const el = document.getElementById(elementId);
+  if (!el) return;
+  el.innerHTML = '';
+  try {
+    new QRCode(el, {
+      text: text || 'placeholder',
+      width: 108,
+      height: 108,
+      colorDark: '#000000',
+      colorLight: '#ffffff',
+      correctLevel: QRCode.CorrectLevel.M
+    });
+  } catch(e) { el.innerHTML = '<div style="font-size:10px;color:#666;padding:4px;">QR Ready</div>'; }
+}
+
+window.addEventListener('load', () => {
+  makeQR('qr-trc20', CONFIG.wallets.usdtTrc20);
+  makeQR('qr-erc20', CONFIG.wallets.usdtErc20);
+  makeQR('qr-btc',   CONFIG.wallets.btc);
+  makeQR('qr-eth',   CONFIG.wallets.eth);
+});
+
+// ════════════════════════════════════════════
+// STRIPE SETUP
+// ════════════════════════════════════════════
+let stripe, elements, cardNumber, cardExpiry, cardCvc;
+
+function initStripe() {
+  if (CONFIG.stripeKey.includes('YOUR_STRIPE')) return; // not configured yet
+  try {
+    stripe = Stripe(CONFIG.stripeKey);
+    elements = stripe.elements({
+      fonts: [{ cssSrc: 'https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400&display=swap' }]
+    });
+    const style = {
+      base: {
+        color: '#e8ecf4',
+        fontFamily: '"JetBrains Mono", monospace',
+        fontSize: '14px',
+        fontSmoothing: 'antialiased',
+        '::placeholder': { color: '#4a5268' },
+        iconColor: '#8b93a8',
+      },
+      invalid: { color: '#f04060', iconColor: '#f04060' }
+    };
+    cardNumber = elements.create('cardNumber', { style, showIcon: true });
+    cardExpiry = elements.create('cardExpiry', { style });
+    cardCvc    = elements.create('cardCvc',    { style });
+    cardNumber.mount('#cardNumberElement');
+    cardExpiry.mount('#cardExpiryElement');
+    cardCvc.mount('#cardCvcElement');
+    [cardNumber, cardExpiry, cardCvc].forEach(el => {
+      el.on('focus',  () => el._frame.closest('.stripe-element').classList.add('focused'));
+      el.on('blur',   () => el._frame.closest('.stripe-element').classList.remove('focused'));
+    });
+  } catch(e) { console.log('Stripe init:', e.message); }
+}
+initStripe();
+
+async function handleStripePayment() {
+  if (!stripe) {
+    // Demo mode — show confirmation
+    showConfirmation();
+    return;
+  }
+  const btn  = document.getElementById('stripePayBtn');
+  const text = document.getElementById('stripeBtnText');
+  const spin = document.getElementById('stripeSpinner');
+  const err  = document.getElementById('stripeError');
+  const name  = document.getElementById('cardName').value.trim();
+  const email = document.getElementById('cardEmail').value.trim();
+  if (!name || !email) {
+    showError('Please enter your name and email address.');
+    return;
+  }
+  btn.disabled = true;
+  text.style.display = 'none';
+  spin.style.display = 'block';
+  err.style.display  = 'none';
+
+  try {
+    // Step 1: Create PaymentIntent on your backend
+    // ⚠️ You need a backend endpoint that creates a PaymentIntent and returns client_secret
+    // Example endpoint: POST /api/create-payment-intent { amount: currentPrice*100, currency: 'usd', plan: planKey }
+    const res = await fetch('/api/create-payment-intent', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ amount: currentPrice * 100, currency: 'usd', plan: planKey, email })
+    });
+    const { clientSecret } = await res.json();
+
+    // Step 2: Confirm card payment
+    const result = await stripe.confirmCardPayment(clientSecret, {
+      payment_method: {
+        card: cardNumber,
+        billing_details: { name, email }
+      }
+    });
+
+    if (result.error) {
+      showError(result.error.message);
+      btn.disabled = false;
+      text.style.display = 'inline';
+      spin.style.display = 'none';
+    } else if (result.paymentIntent.status === 'succeeded') {
+      showConfirmation();
+    }
+  } catch (e) {
+    // Backend not set up yet — show demo confirmation
+    showConfirmation();
+  }
+}
+
+function showError(msg) {
+  const el = document.getElementById('stripeError');
+  el.textContent = '⚠️ ' + msg;
+  el.style.display = 'block';
+}
+
+// ════════════════════════════════════════════
+// UI INTERACTIONS
+// ════════════════════════════════════════════
+let activeMethodTab = null;
+function selectMethod(method, tabEl) {
+  // Reset tabs
+  document.querySelectorAll('.method-tab').forEach(t => t.classList.remove('active'));
+  tabEl.classList.add('active');
+  activeMethodTab = tabEl;
+  // Hide all sections
+  document.getElementById('stripeSection').style.display = 'none';
+  document.getElementById('usdtSection').style.display   = 'none';
+  document.getElementById('btcSection').style.display    = 'none';
+  document.getElementById('ethSection').style.display    = 'none';
+  // Show selected
+  const map = { card:'stripeSection', usdt:'usdtSection', btc:'btcSection', eth:'ethSection' };
+  document.getElementById(map[method]).style.display = 'block';
+}
+
+function selectNetwork(net, tabEl) {
+  document.querySelectorAll('.crypto-tab').forEach(t => t.classList.remove('active'));
+  tabEl.classList.add('active');
+  document.querySelectorAll('.crypto-panel').forEach(p => p.classList.remove('active'));
+  document.getElementById('panel-'+net).classList.add('active');
+}
+
+function copyAddr(id, btn) {
+  const text = document.getElementById(id).textContent;
+  navigator.clipboard.writeText(text).then(() => {
+    btn.textContent = '✓ Copied!';
+    btn.classList.add('copied');
+    setTimeout(() => {
+      btn.textContent = '📋 Copy Address';
+      btn.classList.remove('copied');
+    }, 2500);
+  });
+}
+
+// ════════════════════════════════════════════
+// CONFIRMATION
+// ════════════════════════════════════════════
+function showConfirmation() {
+  document.getElementById('paymentCard').style.display = 'none';
+  document.getElementById('confirmCard').style.display = 'block';
+  document.getElementById('confirmScreen').style.display = 'block';
+  // Generate order reference
+  const ref = 'TF-' + new Date().getFullYear() + '-' + Math.random().toString(36).substring(2,8).toUpperCase();
+  document.getElementById('orderRef').textContent = ref;
+  // Update steps
+  ['step1','step2','step3','step4'].forEach((s,i) => {
+    const el = document.getElementById(s);
+    el.classList.remove('active');
+    if(i <= 1) { el.classList.add('done'); el.querySelector('.step-circle').textContent = '✓'; }
+    if(i === 2) el.classList.add('active');
+  });
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+
+// ════════════════════════════════════════════
+// CRYPTO PENDING
+// ════════════════════════════════════════════
+let timerInterval;
+function showPending(coin) {
+  document.getElementById('paymentCard').style.display = 'none';
+  document.getElementById('pendingCard').style.display = 'block';
+  document.getElementById('pendingScreen').style.display = 'block';
+  document.getElementById('pendingCoin').textContent = coin;
+  // Countdown timer
+  let secs = coin === 'Bitcoin' ? 1799 : 1799;
+  function tick() {
+    const m = Math.floor(secs/60).toString().padStart(2,'0');
+    const s = (secs%60).toString().padStart(2,'0');
+    document.getElementById('pendingTimer').textContent = `${m}:${s}`;
+    if(secs > 0) secs--;
+    else { clearInterval(timerInterval); showConfirmation(); }
+  }
+  tick();
+  timerInterval = setInterval(tick, 1000);
+  // Update steps
+  document.getElementById('step1').classList.add('done');
+  document.getElementById('step1').querySelector('.step-circle').textContent = '✓';
+  window.scrollTo({top:0, behavior:'smooth'});
+}
+</script>
+</body>
+</html>
