@@ -1,0 +1,135 @@
+<!--
+═══════════════════════════════════════════════════════════════
+  THE FUNDED TRADERS — NAV AUTH SYNC
+  
+  STEP 1: In your existing nav HTML on every page, find your
+  login button and add id="nav-auth-area" to its parent div.
+  
+  Example — change this:
+    <div class="nav-buttons">
+      <a href="profile.html">Login</a>
+    </div>
+  
+  To this:
+    <div class="nav-buttons" id="nav-auth-area">
+      <a href="profile.html">Login</a>
+    </div>
+  
+  STEP 2: Paste this entire <script> block just before </body>
+  on EVERY page: index.html, challenges.html, how-it-works.html,
+  contact.html, etc.
+  
+  That's it. The nav will automatically show the avatar + 
+  Sign Out button when someone is logged in, and the Login /
+  Get Started buttons when they are not.
+═══════════════════════════════════════════════════════════════
+-->
+
+<script type="module">
+  import { initializeApp }   from "https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged, signOut }
+                              from "https://www.gstatic.com/firebasejs/12.13.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey:            "AIzaSyDaKGU5Nrtof0lA7GwZN9baIwdpVZaftbQ",
+    authDomain:        "the-funded.firebaseapp.com",
+    projectId:         "the-funded",
+    storageBucket:     "the-funded.firebasestorage.app",
+    messagingSenderId: "656425279116",
+    appId:             "1:656425279116:web:d309fc0a731066f28225a9"
+  };
+
+  /* Prevent double-initialisation if Firebase is already started on the page */
+  let app;
+  try {
+    const { getApps, getApp } = await import("https://www.gstatic.com/firebasejs/12.13.0/firebase-app.js");
+    app = getApps().length ? getApp() : initializeApp(firebaseConfig);
+  } catch(e) {
+    app = initializeApp(firebaseConfig);
+  }
+
+  const auth = getAuth(app);
+
+  /* Shared styles injected once */
+  if (!document.getElementById('tf-auth-styles')) {
+    const s = document.createElement('style');
+    s.id = 'tf-auth-styles';
+    s.textContent = `
+      .tf-avatar-pill {
+        display:inline-flex; align-items:center; gap:9px;
+        background:rgba(255,255,255,0.04);
+        border:1px solid rgba(255,255,255,0.08);
+        border-radius:40px; padding:5px 14px 5px 5px;
+        text-decoration:none; color:inherit;
+        font-size:13px; font-weight:500;
+        transition:border-color 0.2s;
+        font-family:inherit;
+      }
+      .tf-avatar-pill:hover { border-color:rgba(240,180,41,0.35); }
+      .tf-avatar-circle {
+        width:29px; height:29px; border-radius:50%;
+        background:linear-gradient(135deg,#F0B429,#B8892A);
+        display:inline-flex; align-items:center; justify-content:center;
+        font-weight:700; font-size:12px; color:#0A0C10;
+        flex-shrink:0; font-family:inherit;
+      }
+      .tf-signout-btn {
+        background:transparent;
+        border:1px solid rgba(239,68,68,0.28);
+        border-radius:8px; padding:6px 14px;
+        color:#EF4444; font-size:13px; font-weight:500;
+        cursor:pointer; font-family:inherit;
+        transition:background 0.2s, border-color 0.2s;
+      }
+      .tf-signout-btn:hover { background:rgba(239,68,68,0.08); border-color:rgba(239,68,68,0.45); }
+      .tf-login-btn {
+        display:inline-block; padding:7px 16px;
+        border:1px solid rgba(255,255,255,0.12);
+        border-radius:8px; color:rgba(255,255,255,0.65);
+        text-decoration:none; font-size:14px; font-weight:500;
+        transition:all 0.2s; font-family:inherit;
+      }
+      .tf-login-btn:hover { color:#fff; border-color:rgba(255,255,255,0.28); }
+      .tf-getstarted-btn {
+        display:inline-block; padding:7px 16px;
+        background:#F0B429; color:#0A0C10;
+        border-radius:8px; text-decoration:none;
+        font-size:14px; font-weight:600;
+        transition:background 0.2s; font-family:inherit;
+        border:none; cursor:pointer;
+      }
+      .tf-getstarted-btn:hover { background:#E5A820; }
+    `;
+    document.head.appendChild(s);
+  }
+
+  onAuthStateChanged(auth, (user) => {
+    const area = document.getElementById('nav-auth-area');
+    if (!area) return; /* safety — if nav-auth-area doesn't exist on this page, do nothing */
+
+    if (user) {
+      const name     = user.displayName || user.email.split('@')[0];
+      const initials = name.split(' ').map(w => w[0]).join('').toUpperCase().slice(0, 2);
+      const first    = name.split(' ')[0];
+
+      area.innerHTML = `
+        <a href="profile.html" class="tf-avatar-pill">
+          <span class="tf-avatar-circle">${initials}</span>
+          ${first}
+        </a>
+        <button class="tf-signout-btn" id="tf-logout-btn">Sign Out</button>
+      `;
+
+      document.getElementById('tf-logout-btn').addEventListener('click', async () => {
+        await signOut(auth);
+        window.location.href = 'index.html';
+      });
+
+    } else {
+      area.innerHTML = `
+        <a href="profile.html" class="tf-login-btn">Login</a>
+        <a href="profile.html#signup" class="tf-getstarted-btn">Get Started</a>
+      `;
+    }
+  });
+</script>
