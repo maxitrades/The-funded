@@ -1,0 +1,64 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Nav Auth Snippet – The Funded Traders</title>
+  <style>
+    body { font-family: monospace; background: #0a0c0f; color: #c9a84c; padding: 2rem; line-height: 1.7; }
+    h1 { font-size: 1.1rem; margin-bottom: 1rem; color: #e8eaf0; }
+    p { color: #7a8190; font-size: 0.875rem; margin-bottom: 1rem; }
+    pre { background: #111418; border: 1px solid rgba(201,168,76,0.2); border-radius: 8px; padding: 1.5rem; font-size: 0.82rem; overflow-x: auto; white-space: pre-wrap; color: #e8eaf0; }
+  </style>
+</head>
+<body>
+  <h1>📋 Nav Auth Snippet — add to index.html, challenges.html, etc.</h1>
+  <p>Step 1: Make sure your nav has these IDs on the links:</p>
+  <pre>
+&lt;!-- In your nav, add these IDs --&gt;
+&lt;a href="login.html"    id="navLogin"    class="..."&gt;Login&lt;/a&gt;
+&lt;a href="signup.html"   id="navSignup"   class="..."&gt;Sign Up&lt;/a&gt;
+&lt;a href="dashboard.html" id="navDashboard" class="..." style="display:none"&gt;Dashboard&lt;/a&gt;
+&lt;a href="profile.html"  id="navProfile"  class="..." style="display:none"&gt;My Profile&lt;/a&gt;
+  </pre>
+  <p>Step 2: Paste this script at the bottom of every page (before &lt;/body&gt;):</p>
+  <pre>
+&lt;script type="module"&gt;
+  import { initializeApp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+  import { getAuth, onAuthStateChanged } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+
+  const firebaseConfig = {
+    apiKey: "AIzaSyDaKGU5Nrtof0lA7GwZN9baIwdpVZaftbQ",
+    authDomain: "the-funded.firebaseapp.com",
+    projectId: "the-funded",
+    storageBucket: "the-funded.firebasestorage.app",
+    messagingSenderId: "656425279116",
+    appId: "1:656425279116:web:d309fc0a731066f28225a9"
+  };
+  const app = initializeApp(firebaseConfig);
+  const auth = getAuth(app);
+
+  onAuthStateChanged(auth, (user) => {
+    const login    = document.getElementById('navLogin');
+    const signup   = document.getElementById('navSignup');
+    const dash     = document.getElementById('navDashboard');
+    const profile  = document.getElementById('navProfile');
+
+    if (user) {
+      // Logged in: hide login/signup, show dashboard/profile
+      if (login)   login.style.display   = 'none';
+      if (signup)  signup.style.display  = 'none';
+      if (dash)    dash.style.display    = '';
+      if (profile) profile.style.display = '';
+    } else {
+      // Logged out: show login/signup, hide dashboard/profile
+      if (login)   login.style.display   = '';
+      if (signup)  signup.style.display  = '';
+      if (dash)    dash.style.display    = 'none';
+      if (profile) profile.style.display = 'none';
+    }
+  });
+&lt;/script&gt;
+  </pre>
+  <p>That's it! This handles all public-facing pages. Dashboard and Profile pages have their own full auth logic.</p>
+</body>
+</html>
