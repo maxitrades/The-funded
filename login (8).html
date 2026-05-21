@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Log In – Funded Baby</title>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&family=DM+Sans:wght@400;500&display=swap" rel="stylesheet">
+<style>
+:root {
+  --green:#22c55e;--green-light:#4ade80;--green-dark:#16a34a;
+  --green-xlight:#bbf7d0;--green-dim:rgba(34,197,94,0.12);
+  --green-border:rgba(34,197,94,0.28);
+  --bg:#f0fdf4;--bg3:#ecfdf5;--card:#ffffff;
+  --border:rgba(34,197,94,0.20);--border2:rgba(0,0,0,0.07);
+  --text:#0f1f16;--text2:#1a3328;--muted:#5a7a68;--muted2:#8aab97;
+  --red:#ef4444;--red-dim:rgba(239,68,68,0.10);
+  --shadow-lg:0 8px 40px rgba(34,197,94,0.18);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'DM Sans',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;display:flex;flex-direction:column}
+h1,h2,h3{font-family:'Syne',sans-serif}
+
+.page-wrap{
+  flex:1;display:grid;grid-template-columns:1fr 1fr;min-height:100vh;
+}
+/* Left panel - brand */
+.brand-panel{
+  background:var(--green-dark);
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+  padding:60px 48px;position:relative;overflow:hidden;
+}
+.brand-panel::before{
+  content:'';position:absolute;top:-20%;left:-20%;width:140%;height:140%;
+  background:radial-gradient(ellipse at 60% 40%, rgba(255,255,255,0.07) 0%, transparent 60%);
+  pointer-events:none;
+}
+.brand-panel .logo{
+  font-family:'Syne',sans-serif;font-size:26px;font-weight:800;
+  color:#fff;display:flex;align-items:center;gap:10px;margin-bottom:48px;align-self:flex-start;
+  text-decoration:none;
+}
+.logo-mark{width:38px;height:38px;background:rgba(255,255,255,0.20);border-radius:10px;display:flex;align-items:center;justify-content:center;font-size:20px}
+.brand-panel h2{font-size:36px;font-weight:800;color:#fff;line-height:1.15;margin-bottom:20px}
+.brand-panel p{font-size:16px;color:rgba(255,255,255,0.75);line-height:1.7;max-width:360px}
+.stats-row{display:grid;grid-template-columns:1fr 1fr;gap:16px;margin-top:48px;width:100%}
+.stat-chip{background:rgba(255,255,255,0.10);border:1px solid rgba(255,255,255,0.15);border-radius:12px;padding:18px;text-align:center}
+.stat-chip .v{font-family:'Syne',sans-serif;font-size:24px;font-weight:700;color:#fff}
+.stat-chip .l{font-size:12px;color:rgba(255,255,255,0.65);margin-top:4px}
+
+/* Right panel - form */
+.form-panel{
+  display:flex;flex-direction:column;justify-content:center;align-items:center;
+  padding:60px 48px;background:var(--bg);
+}
+.form-box{width:100%;max-width:400px}
+.form-box h1{font-size:28px;font-weight:800;color:var(--text2);margin-bottom:6px}
+.form-box .sub{font-size:14px;color:var(--muted);margin-bottom:32px}
+
+.tabs{display:flex;background:var(--bg3);border-radius:10px;padding:4px;margin-bottom:28px;border:1px solid var(--border)}
+.tab{flex:1;padding:9px;text-align:center;font-size:13px;font-weight:500;cursor:pointer;border-radius:7px;transition:all .2s;color:var(--muted);border:none;background:transparent;font-family:'DM Sans',sans-serif}
+.tab.active{background:var(--green);color:#fff;font-weight:600}
+
+.form-group{margin-bottom:18px}
+.form-group label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px;font-weight:500}
+.form-group input,.form-group select{
+  width:100%;background:var(--bg3);border:1.5px solid var(--border);
+  border-radius:8px;color:var(--text);font-family:'DM Sans',sans-serif;
+  font-size:14px;padding:12px 14px;outline:none;transition:border-color .2s;
+}
+.form-group input:focus,.form-group select:focus{border-color:var(--green);background:#fff}
+.form-group input::placeholder{color:var(--muted2)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:12px}
+
+.btn{cursor:pointer;font-family:'DM Sans',sans-serif;border:none;border-radius:8px;font-size:14px;font-weight:600;padding:13px 20px;transition:all .2s;text-decoration:none;display:inline-flex;align-items:center;justify-content:center;gap:6px;width:100%}
+.btn-green{background:var(--green);color:#fff}
+.btn-green:hover{background:var(--green-dark);transform:translateY(-1px);box-shadow:0 6px 24px rgba(34,197,94,0.32)}
+.btn-green:disabled{opacity:.6;cursor:not-allowed;transform:none}
+.btn-ghost{background:var(--bg3);border:1.5px solid var(--border);color:var(--text);margin-top:10px}
+.btn-ghost:hover{border-color:var(--green);color:var(--green-dark)}
+
+.divider{height:1px;background:var(--border);margin:18px 0}
+.terms-check{display:flex;align-items:flex-start;gap:10px;font-size:12px;color:var(--muted);margin-bottom:20px}
+.terms-check input{margin-top:3px;accent-color:var(--green)}
+
+.forgot{text-align:right;margin-bottom:20px}
+.forgot a{font-size:12px;color:var(--green-dark);text-decoration:none}
+
+.error-msg{background:var(--red-dim);border:1px solid rgba(239,68,68,0.25);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--red);margin-bottom:16px;display:none}
+.success-msg{background:rgba(34,197,94,0.10);border:1px solid var(--green-border);border-radius:8px;padding:10px 14px;font-size:13px;color:var(--green-dark);margin-bottom:16px;display:none}
+
+.tab-content{display:none}
+.tab-content.active{display:block}
+
+.back-home{display:flex;align-items:center;gap:6px;font-size:13px;color:var(--muted);text-decoration:none;margin-bottom:32px;transition:color .2s}
+.back-home:hover{color:var(--green-dark)}
+
+@media(max-width:768px){
+  .page-wrap{grid-template-columns:1fr}
+  .brand-panel{display:none}
+  .form-panel{padding:40px 24px}
+  .form-row{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+<div class="page-wrap">
+  <!-- Brand Panel -->
+  <div class="brand-panel">
+    <a href="index.html" class="logo">
+      <div class="logo-mark">🌱</div>
+      Funded Baby
+    </a>
+    <h2>Your Journey to Funded Trading Starts Here</h2>
+    <p>Join thousands of traders who've already proven their edge and received live capital to trade. No tricks, just performance.</p>
+    <div class="stats-row">
+      <div class="stat-chip"><div class="v">2,400+</div><div class="l">Funded Traders</div></div>
+      <div class="stat-chip"><div class="v">$4.2M+</div><div class="l">Paid Out</div></div>
+      <div class="stat-chip"><div class="v">90%</div><div class="l">Profit Split</div></div>
+      <div class="stat-chip"><div class="v">48h</div><div class="l">Avg Payout</div></div>
+    </div>
+  </div>
+  <!-- Form Panel -->
+  <div class="form-panel">
+    <div class="form-box">
+      <a href="index.html" class="back-home">← Back to home</a>
+      <h1 id="formTitle">Welcome Back</h1>
+      <p class="sub" id="formSub">Sign in to your Funded Baby account</p>
+      <div class="tabs">
+        <button class="tab active" id="tabLogin" onclick="switchTab('login')">Log In</button>
+        <button class="tab" id="tabSignup" onclick="switchTab('signup')">Sign Up</button>
+      </div>
+
+      <div class="error-msg" id="errMsg"></div>
+      <div class="success-msg" id="successMsg"></div>
+
+      <!-- LOGIN -->
+      <div class="tab-content active" id="loginTab">
+        <div class="form-group"><label>Email Address</label><input type="email" id="l-email" placeholder="you@example.com"></div>
+        <div class="form-group"><label>Password</label><input type="password" id="l-pass" placeholder="••••••••"></div>
+        <div class="forgot"><a href="#">Forgot password?</a></div>
+        <button class="btn btn-green" onclick="handleLogin()" id="loginBtn">Log In →</button>
+        <div class="divider"></div>
+        <button class="btn btn-ghost" onclick="showErr('Google login coming soon!')">Continue with Google</button>
+      </div>
+
+      <!-- SIGNUP -->
+      <div class="tab-content" id="signupTab">
+        <div class="form-row">
+          <div class="form-group"><label>First Name</label><input type="text" id="s-fname" placeholder="John"></div>
+          <div class="form-group"><label>Last Name</label><input type="text" id="s-lname" placeholder="Smith"></div>
+        </div>
+        <div class="form-group"><label>Email Address</label><input type="email" id="s-email" placeholder="you@example.com"></div>
+        <div class="form-group"><label>Password</label><input type="password" id="s-pass" placeholder="Min. 8 characters"></div>
+        <div class="form-group">
+          <label>Country</label>
+          <select id="s-country">
+            <option value="">Select your country...</option>
+            <option>Kenya</option><option>Nigeria</option><option>South Africa</option>
+            <option>Ghana</option><option>Uganda</option><option>Tanzania</option>
+            <option>United States</option><option>United Kingdom</option><option>Other</option>
+          </select>
+        </div>
+        <div class="terms-check">
+          <input type="checkbox" id="s-terms">
+          <label for="s-terms">I agree to the <a href="#" style="color:var(--green-dark)">Terms of Service</a> and <a href="#" style="color:var(--green-dark)">Privacy Policy</a></label>
+        </div>
+        <button class="btn btn-green" onclick="handleSignup()" id="signupBtn">Create Account →</button>
+        <div class="divider"></div>
+        <button class="btn btn-ghost" onclick="showErr('Google signup coming soon!')">Continue with Google</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+import { initializeApp, getApps } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-app.js";
+import { getAuth, onAuthStateChanged, signInWithEmailAndPassword, createUserWithEmailAndPassword, updateProfile } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-auth.js";
+import { getFirestore, doc, setDoc, serverTimestamp } from "https://www.gstatic.com/firebasejs/10.12.0/firebase-firestore.js";
+
+const firebaseConfig = { apiKey:"AIzaSyDaKGU5Nrtof0lA7GwZN9baIwdpVZaftbQ",authDomain:"the-funded.firebaseapp.com",projectId:"the-funded",storageBucket:"the-funded.firebasestorage.app",messagingSenderId:"656425279116",appId:"1:656425279116:web:d309fc0a731066f28225a9" };
+const app = getApps().length ? getApps()[0] : initializeApp(firebaseConfig);
+const auth = getAuth(app);
+const db = getFirestore(app);
+
+// Redirect if already logged in
+onAuthStateChanged(auth, (user) => { if (user) window.location.href = 'dashboard.html'; });
+
+window.handleLogin = async function() {
+  const email = document.getElementById('l-email').value.trim();
+  const pass = document.getElementById('l-pass').value;
+  const btn = document.getElementById('loginBtn');
+  clearMsgs();
+  if (!email || !pass) { showErr('Please enter your email and password.'); return; }
+  btn.textContent = 'Signing in…'; btn.disabled = true;
+  try {
+    await signInWithEmailAndPassword(auth, email, pass);
+    showSuccess('Login successful! Redirecting…');
+    setTimeout(() => window.location.href = 'dashboard.html', 1000);
+  } catch(e) {
+    showErr(e.code === 'auth/wrong-password' || e.code === 'auth/user-not-found' || e.code === 'auth/invalid-credential' ? 'Invalid email or password. Please try again.' : e.message);
+  } finally { btn.textContent = 'Log In →'; btn.disabled = false; }
+};
+
+window.handleSignup = async function() {
+  const fname = document.getElementById('s-fname').value.trim();
+  const lname = document.getElementById('s-lname').value.trim();
+  const email = document.getElementById('s-email').value.trim();
+  const pass = document.getElementById('s-pass').value;
+  const country = document.getElementById('s-country').value;
+  const terms = document.getElementById('s-terms').checked;
+  const btn = document.getElementById('signupBtn');
+  clearMsgs();
+  if (!fname||!lname||!email||!pass||!country) { showErr('Please fill in all fields.'); return; }
+  if (pass.length < 8) { showErr('Password must be at least 8 characters.'); return; }
+  if (!terms) { showErr('Please agree to the Terms of Service.'); return; }
+  btn.textContent = 'Creating account…'; btn.disabled = true;
+  try {
+    const cred = await createUserWithEmailAndPassword(auth, email, pass);
+    await updateProfile(cred.user, { displayName: `${fname} ${lname}` });
+    await setDoc(doc(db, 'users', cred.user.uid), { firstName:fname, lastName:lname, email, country, totalPayout:0, createdAt:serverTimestamp() });
+    showSuccess('Account created! Redirecting to dashboard…');
+    setTimeout(() => window.location.href = 'dashboard.html', 1500);
+  } catch(e) {
+    showErr(e.code === 'auth/email-already-in-use' ? 'This email is already registered. Try logging in.' : e.message);
+  } finally { btn.textContent = 'Create Account →'; btn.disabled = false; }
+};
+
+function showErr(msg) { const el = document.getElementById('errMsg'); el.textContent = msg; el.style.display = ''; }
+window.showErr = showErr;
+function showSuccess(msg) { const el = document.getElementById('successMsg'); el.textContent = msg; el.style.display = ''; }
+function clearMsgs() { document.getElementById('errMsg').style.display='none'; document.getElementById('successMsg').style.display='none'; }
+</script>
+
+<script>
+window.switchTab = function(tab) {
+  document.getElementById('formTitle').textContent = tab === 'login' ? 'Welcome Back' : 'Create Account';
+  document.getElementById('formSub').textContent = tab === 'login' ? 'Sign in to your Funded Baby account' : 'Join 2,400+ funded traders today';
+  document.getElementById('loginTab').classList.toggle('active', tab === 'login');
+  document.getElementById('signupTab').classList.toggle('active', tab === 'signup');
+  document.getElementById('tabLogin').classList.toggle('active', tab === 'login');
+  document.getElementById('tabSignup').classList.toggle('active', tab === 'signup');
+  document.getElementById('errMsg').style.display = 'none';
+  document.getElementById('successMsg').style.display = 'none';
+};
+// Check for ?tab=signup in URL
+const urlParams = new URLSearchParams(window.location.search);
+if (urlParams.get('tab') === 'signup') switchTab('signup');
+</script>
+</body>
+</html>
